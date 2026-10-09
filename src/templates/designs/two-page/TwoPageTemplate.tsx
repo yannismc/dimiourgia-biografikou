@@ -1,5 +1,12 @@
 import { padding } from '@/helpers/resume-style/styles';
-import { useContext, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  useContext,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
 import { useSectionLayoutRuntime } from '@/helpers/section-layout';
 import { StateContext } from '@/modules/builder/resume/ResumeLayout';
 import { pageStyle } from '@/templates/components/primitives/layoutPrimitives';
@@ -50,7 +57,13 @@ function ResumePage({ children, pageNumber }: { children: ReactNode; pageNumber:
       <div
         ref={pageRef}
         className="resume-page-content"
-        style={{ ...pageStyle(palette), padding: padding('14px 18px') }}
+        style={{
+          ...pageStyle(palette),
+          padding: padding('14px 18px'),
+          ...(pageNumber === 1
+            ? ({ '--resume-section': '6px', '--resume-entry': '4px' } as CSSProperties)
+            : {}),
+        }}
       >
         <div
           ref={contentRef}
@@ -74,10 +87,7 @@ export default function TwoPageTemplate() {
   const profileBasics = {
     ...basics,
     url: '',
-    profiles: [
-      ...(basics.url ? [{ network: 'website', username: 'website', url: basics.url }] : []),
-      ...(basics.profiles ?? []),
-    ],
+    profiles: basics.profiles ?? [],
   };
   const renderSection = (id: string) => {
     switch (id) {
@@ -85,8 +95,6 @@ export default function TwoPageTemplate() {
         return (
           <ProfileSummarySection
             html={basics.summary}
-            image={basics.image}
-            imageAlt="Φωτογραφία προφίλ"
             title="Επαγγελματικό Προφίλ"
             density="compact"
           />
@@ -175,6 +183,9 @@ export default function TwoPageTemplate() {
         <ResumePage pageNumber={1}>
           <ExperienceProfile
             basics={profileBasics}
+            photo={basics.image}
+            websiteUrl={basics.url}
+            showExperienceMetrics={false}
             labels={{
               profile: 'Προφίλ',
               relevantExperience: 'Σχετική επαγγελματική εμπειρία',

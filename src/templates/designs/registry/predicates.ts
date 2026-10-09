@@ -1,5 +1,7 @@
+import { hasContent } from '@/templates/components/primitives/content';
+
 /** Shared “has content” checks for resume sections (aligned with SectionValidator usage). */
-const hasLen = (v: unknown) => !!(v && (typeof v === 'string' ? v.length : (v as any[]).length));
+const hasLen = (v: unknown) => hasContent(v);
 
 export const basicsSummary = (r: any) => hasLen(r.basics?.summary);
 export const basicsObjective = (r: any) => hasLen(r.basics?.objective);

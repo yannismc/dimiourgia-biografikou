@@ -1,9 +1,10 @@
 import { bodySize } from '@/helpers/resume-style/styles';
 import { ContactList } from '../contact';
-import { SocialIconsRow } from '../primitives/Contact';
+import { ContactLine, SocialIconsRow } from '../primitives/Contact';
 import { SectionFrame } from '../primitives/SectionFrame';
 import { useSurfacePalette } from '../theme';
 import type { ProfileBasics } from '../types';
+import { BsGlobe } from 'react-icons/bs';
 type Labels = {
   profile: string;
   relevantExperience: string;
@@ -19,9 +20,15 @@ const DEFAULT_LABELS: Labels = {
 export function ExperienceProfile({
   basics,
   labels = DEFAULT_LABELS,
+  photo,
+  websiteUrl,
+  showExperienceMetrics = true,
 }: {
   basics: ProfileBasics;
   labels?: Labels;
+  photo?: string;
+  websiteUrl?: string;
+  showExperienceMetrics?: boolean;
 }) {
   const p = useSurfacePalette();
   return (
@@ -43,23 +50,50 @@ export function ExperienceProfile({
           fontSize: bodySize(12),
         }}
       >
-        <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <div style={{ color: p.primary, fontSize: bodySize(14), fontWeight: 500 }}>
-            {basics.label}
+        <div style={{ minWidth: 0, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+          {photo && (
+            <img
+              src={photo}
+              alt=""
+              style={{
+                width: 54,
+                height: 54,
+                flex: '0 0 54px',
+                objectFit: 'cover',
+                borderRadius: '50%',
+              }}
+            />
+          )}
+          <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
+            <div style={{ color: p.primary, fontSize: bodySize(14), fontWeight: 500 }}>
+              {basics.label}
+            </div>
+            {websiteUrl && (
+              <ContactLine
+                icon={<BsGlobe />}
+                text={websiteUrl}
+                href={websiteUrl}
+                density="comfortable"
+              />
+            )}
+            {showExperienceMetrics && basics.relExp && (
+              <div>
+                {labels.relevantExperience}: {basics.relExp}
+              </div>
+            )}
+            {showExperienceMetrics && basics.totalExp && (
+              <div>
+                {labels.totalExperience}: {basics.totalExp}
+              </div>
+            )}
           </div>
-          {basics.relExp && (
-            <div>
-              {labels.relevantExperience}: {basics.relExp}
-            </div>
-          )}
-          {basics.totalExp && (
-            <div>
-              {labels.totalExperience}: {basics.totalExp}
-            </div>
-          )}
         </div>
         <div style={{ marginLeft: 'auto', minWidth: 0, maxWidth: '100%' }}>
-          <ContactList basics={{ ...basics, profiles: [] }} density="comfortable" align="right" />
+          <ContactList
+            basics={{ ...basics, url: websiteUrl ? '' : basics.url, profiles: [] }}
+            density="comfortable"
+            align="right"
+          />
         </div>
       </div>
     </SectionFrame>
