@@ -7,6 +7,7 @@
 export const REGION_IDS = {
   left: 'left',
   right: 'right',
+  footer: 'footer',
   main: 'main',
   sidebar: 'sidebar',
 } as const;

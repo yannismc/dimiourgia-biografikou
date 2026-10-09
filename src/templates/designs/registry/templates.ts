@@ -69,7 +69,7 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
   professional: {
     id: 'professional',
     style: {
-      padding: [40, 25, 40, 25],
+      padding: [20, 25, 20, 25],
       section: 16,
       entry: 12,
       column: 14,
@@ -82,7 +82,7 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
     name: 'Επαγγελματικό Βιογραφικό',
     thumbnail: '/templates/professional.webp',
     sectionLayout: {
-      regionKeys: [REGION_IDS.left, REGION_IDS.right],
+      regionKeys: [REGION_IDS.left, REGION_IDS.right, REGION_IDS.footer],
       defaults: {
         [REGION_IDS.left]: [SECTION_IDS.work, SECTION_IDS.involvement, SECTION_IDS.achievements],
         [REGION_IDS.right]: [
@@ -92,8 +92,8 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
           SECTION_IDS.skillsExposure,
           SECTION_IDS.methodology,
           SECTION_IDS.tools,
-          SECTION_IDS.education,
         ],
+        [REGION_IDS.footer]: [SECTION_IDS.education],
       },
     },
     sectionRules: [
