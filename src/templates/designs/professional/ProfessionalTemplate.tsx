@@ -109,44 +109,50 @@ export default function ProfessionalTemplate() {
           height: 'auto',
           minHeight: '100%',
           padding: padding('20px 25px'),
-          display: 'grid',
-          gridTemplateColumns: columns('minmax(0, 2fr) minmax(0, 1fr)', false, secondaryPercent),
-          gridTemplateRows: 'auto auto',
-          alignContent: 'start',
+          display: 'flex',
+          flexDirection: 'column',
           gap: spacing('column', 14),
         }}
       >
-        <div style={{ minWidth: 0, gridColumn: 1, gridRow: 1 }}>
-          <EditableResumeSection id="basics">
-            <ExperienceProfile
-              basics={profileBasics}
-              labels={{
-                profile: 'Προφίλ',
-                relevantExperience: 'Σχετική επαγγελματική εμπειρία',
-                totalExperience: 'Συνολική επαγγελματική εμπειρία',
-              }}
+        <div
+          style={{
+            minWidth: 0,
+            display: 'grid',
+            gridTemplateColumns: columns('minmax(0, 2fr) minmax(0, 1fr)', false, secondaryPercent),
+            alignItems: 'start',
+            gap: spacing('column', 14),
+          }}
+        >
+          <div style={{ minWidth: 0 }}>
+            <EditableResumeSection id="basics">
+              <ExperienceProfile
+                basics={profileBasics}
+                labels={{
+                  profile: 'Προφίλ',
+                  relevantExperience: 'Σχετική επαγγελματική εμπειρία',
+                  totalExperience: 'Συνολική επαγγελματική εμπειρία',
+                }}
+              />
+            </EditableResumeSection>
+            <TemplateRegion
+              regionId="left"
+              items={regions.left}
+              renderSection={renderSection}
+              language="el"
             />
-          </EditableResumeSection>
+          </div>
           <TemplateRegion
-            regionId="left"
-            items={regions.left}
+            regionId="right"
+            items={regions.right}
             renderSection={renderSection}
             language="el"
           />
         </div>
         <TemplateRegion
-          regionId="right"
-          items={regions.right}
-          renderSection={renderSection}
-          language="el"
-          style={{ gridColumn: 2, gridRow: 1 }}
-        />
-        <TemplateRegion
           regionId="footer"
           items={regions.footer}
           renderSection={renderSection}
           language="el"
-          style={{ gridColumn: '1 / -1', gridRow: 2, minWidth: 0 }}
         />
       </div>
     </ResumePresentation>

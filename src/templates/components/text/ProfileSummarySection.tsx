@@ -15,7 +15,7 @@ export function ProfileSummarySection({
   if (!hasContent(html)) return null;
   return (
     <SectionFrame title={title} density={density}>
-      <div style={{ display: 'flow-root' }}>
+      <div style={{ display: 'flow-root', textAlign: 'justify' }}>
         {image && (
           <img
             src={image}
