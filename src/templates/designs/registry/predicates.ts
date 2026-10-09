@@ -11,11 +11,15 @@ export const normalizeInstitution = (value: unknown) =>
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLocaleLowerCase('el');
+export const isTeiAthensExperience = (item: any) => {
+  const institution = normalizeInstitution(item?.name);
+  return institution.includes('tei athin') || institution.includes('τει αθην');
+};
 export const isResearchExperience = (item: any) => {
   const institution = normalizeInstitution(item?.name);
   return (
     institution.includes('universite savoie mont blanc') ||
-    institution.includes('tei athin') ||
+    isTeiAthensExperience(item) ||
     institution.includes('εργαστηριο ανανεωσιμων πηγων ενεργειας')
   );
 };

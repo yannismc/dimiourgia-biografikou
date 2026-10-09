@@ -20,7 +20,11 @@ import { ProfileSummarySection, TextSection } from '@/templates/components/text'
 import type { ExperienceItem } from '@/templates/components/types';
 import { ProjectsSection } from '@/templates/components/projects';
 import { TemplateRegion } from '@/templates/designs/integration/TemplateRegion';
-import { isResearchExperience, normalizeInstitution } from '@/templates/designs/registry/predicates';
+import {
+  isResearchExperience,
+  isTeiAthensExperience,
+  normalizeInstitution,
+} from '@/templates/designs/registry/predicates';
 
 const languageDescriptors: Record<string, string> = {
   ελληνικα: 'μητρική',
@@ -45,7 +49,6 @@ function ResumePage({ children, pageNumber }: { children: ReactNode; pageNumber:
   const palette = useResumePalette();
   const pageRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const fitFactorRef = useRef(1);
   const [fitFactor, setFitFactor] = useState(1);
 
   useLayoutEffect(() => {
@@ -59,17 +62,12 @@ function ResumePage({ children, pageNumber }: { children: ReactNode; pageNumber:
         Number.parseFloat(pageStyle.paddingTop) + Number.parseFloat(pageStyle.paddingBottom);
       const availableHeight = page.clientHeight - verticalPadding;
       const contentHeight = content.scrollHeight;
-      if (availableHeight > 0 && contentHeight > availableHeight + 1) {
-        const nextFactor =
-          fitFactorRef.current * (availableHeight / contentHeight) * 0.995;
-        if (nextFactor < fitFactorRef.current - 0.001) {
-          fitFactorRef.current = nextFactor;
-          setFitFactor(nextFactor);
-        }
-      } else if (contentHeight < availableHeight * 0.75 && fitFactorRef.current < 1) {
-        fitFactorRef.current = 1;
-        setFitFactor(1);
-      }
+      if (availableHeight <= 0 || contentHeight <= 0) return;
+      const appliedScale =
+        Number.parseFloat(window.getComputedStyle(content).getPropertyValue('--resume-fit-scale')) ||
+        1;
+      const nextFactor = Math.min(1, (appliedScale * availableHeight * 0.995) / contentHeight);
+      if (Math.abs(nextFactor - appliedScale) > 0.001) setFitFactor(nextFactor);
     };
 
     fitPage();
@@ -146,7 +144,7 @@ export default function TwoPageTemplate() {
       case 'research_experience': {
         const items = data.work.filter((item: ExperienceItem) => isResearchExperience(item));
         const teiIds = items
-          .filter((item: ExperienceItem) => normalizeInstitution(item.name).includes('tei athin'))
+          .filter((item: ExperienceItem) => isTeiAthensExperience(item))
           .map((item: ExperienceItem) => item.id);
         return (
           <TimelineExperience
