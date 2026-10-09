@@ -45,6 +45,19 @@ function languageSummary(languages: readonly { name: string }[]) {
   return text ? `<p>${text}</p>` : '';
 }
 
+function removeDuplicatePublicationsHeading(html?: string) {
+  if (!html) return html;
+  return html.replace(/^\s*<(p|h[1-6])\b[^>]*>([\s\S]*?)<\/\1>\s*/i, (block, _tag, inner) => {
+    const heading = inner
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/&nbsp;|&#160;/gi, ' ')
+      .replace(/&amp;/gi, '&')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return normalizeInstitution(heading) === 'επιλεγμενες δημοσιευσεις' ? '' : block;
+  });
+}
+
 function ResumePage({ children, pageNumber }: { children: ReactNode; pageNumber: number }) {
   const palette = useResumePalette();
   const pageRef = useRef<HTMLDivElement>(null);
@@ -229,7 +242,7 @@ export default function TwoPageTemplate() {
       case 'publications':
         return (
           <TextSection
-            html={data.activities.publications}
+            html={removeDuplicatePublicationsHeading(data.activities.publications)}
             title="Επιλεγμένες δημοσιεύσεις"
             density="compact"
           />
