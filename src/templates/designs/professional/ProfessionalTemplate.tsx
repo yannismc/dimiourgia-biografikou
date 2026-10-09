@@ -110,6 +110,7 @@ export default function ProfessionalTemplate() {
           display: 'grid',
           gridTemplateColumns: columns('minmax(0, 2fr) minmax(0, 1fr)', false, secondaryPercent),
           gridTemplateRows: 'auto auto',
+          alignContent: 'start',
           gap: spacing('column', 14),
         }}
       >
