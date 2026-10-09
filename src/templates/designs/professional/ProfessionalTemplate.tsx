@@ -21,6 +21,14 @@ export default function ProfessionalTemplate() {
   const { regions } = useSectionLayoutRuntime();
   const resumePalette = useResumePalette();
   const basics = data.basics;
+  const profileBasics = {
+    ...basics,
+    url: '',
+    profiles: [
+      ...(basics.url ? [{ network: 'website', username: 'website', url: basics.url }] : []),
+      ...(basics.profiles ?? []),
+    ],
+  };
   const renderSection = (id: string) => {
     switch (id) {
       case 'work':
@@ -85,7 +93,7 @@ export default function ProfessionalTemplate() {
       <div
         style={{
           ...pageStyle(resumePalette),
-          padding: padding('40px 25px'),
+          padding: padding('20px 25px'),
           display: 'grid',
           gridTemplateColumns: columns('minmax(0, 2fr) minmax(0, 1fr)', false, secondaryPercent),
           gap: spacing('column', 14),
@@ -94,7 +102,7 @@ export default function ProfessionalTemplate() {
         <div style={{ minWidth: 0 }}>
           <EditableResumeSection id="basics">
             <ExperienceProfile
-              basics={basics}
+              basics={profileBasics}
               labels={{
                 profile: 'Προφίλ',
                 relevantExperience: 'Συναφής προϋπηρεσία',
@@ -114,6 +122,8 @@ export default function ProfessionalTemplate() {
           items={regions.right}
           renderSection={renderSection}
           language="el"
+          className="professional-right-region"
+          style={{ display: 'flex', flexDirection: 'column' }}
         />
       </div>
     </ResumePresentation>

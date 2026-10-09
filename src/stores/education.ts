@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { GetState, SetState } from './store.interface';
 import { persist } from 'zustand/middleware';
 import { produce } from 'immer';
-import resumeData from '@/helpers/constants/resume-data.json';
+import resumeData from '@/helpers/constants/resumes/Anonym.el.json';
 import { IEducationItem, IEducationStore } from './education.interface';
 
 const addEducation =

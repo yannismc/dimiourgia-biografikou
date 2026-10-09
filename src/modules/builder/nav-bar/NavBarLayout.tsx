@@ -12,7 +12,7 @@ import {
 } from '@/stores/skills';
 
 import { AVAILABLE_TEMPLATES } from '@/helpers/constants';
-import DEFAULT_RESUME_JSON from '@/helpers/constants/resume-data.json';
+import DEFAULT_RESUME_JSON from '@/helpers/constants/resumes/Anonym.el.json';
 import Image from '@/helpers/common/components/Image';
 import Link from 'next/link';
 import { NavMenuItem } from './components/MenuItem';

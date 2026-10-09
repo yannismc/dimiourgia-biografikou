@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import sample from '@/helpers/constants/resume-data.json';
+import sample from '@/helpers/constants/resumes/Anonym.el.json';
 import { useBasicDetails } from '@/stores/basic';
 import { useExperiences } from '@/stores/experience';
 import { applyImportedResumeJson } from './applyImportedResume';

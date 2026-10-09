@@ -62,6 +62,9 @@ body {
   height: 100%;
   display: flow-root;
 }
+.professional-right-region > :last-child {
+  margin-top: auto;
+}
 @media print {
   .resume-a4-page {
     margin: 0;

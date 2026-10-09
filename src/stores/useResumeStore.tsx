@@ -8,7 +8,7 @@ import {
   useTools,
 } from '@/stores/skills';
 
-import ResumeData from '@/helpers/constants/resume-data.json';
+import ResumeData from '@/helpers/constants/resumes/Anonym.el.json';
 import { useSectionLayoutStore } from '@/stores/useSectionLayoutStore';
 import { useActivity } from './activity';
 import { useAwards } from './awards';

@@ -12,7 +12,7 @@ it.each(['removed-template', '__proto__', 'constructor'])(
   (id) => {
     localStorage.setItem('selectedTemplateId', id);
     restoreSavedTemplate();
-    expect(useTemplates.getState().activeTemplate.id).toBe('modern');
+    expect(useTemplates.getState().activeTemplate.id).toBe('professional');
   }
 );
 it('restores a valid saved template', () => {

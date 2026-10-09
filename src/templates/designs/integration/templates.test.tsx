@@ -2,7 +2,7 @@ import { createContext, type ReactNode } from 'react';
 import { render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import ResumeData from '@/helpers/constants/resume-data.json';
+import ResumeData from '@/helpers/constants/resumes/Anonym.el.json';
 import { TEMPLATE_REGISTRY } from '@/templates/designs/registry/templates';
 
 const runtime = vi.hoisted(() => ({ regions: {} as Record<string, string[]> }));

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { produce } from 'immer';
-import resumeData from '@/helpers/constants/resume-data.json';
+import resumeData from '@/helpers/constants/resumes/Anonym.el.json';
 import { IActivityStore, IActivity } from './activity.interface';
 import { SetState } from './store.interface';
 

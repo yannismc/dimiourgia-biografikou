@@ -10,7 +10,7 @@ interface ITemplateStore {
 
 export const useTemplates = create<ITemplateStore>((set) => ({
   availableTemplate: AVAILABLE_TEMPLATES,
-  activeTemplate: AVAILABLE_TEMPLATES['modern'],
+  activeTemplate: AVAILABLE_TEMPLATES['professional'],
 
   setTemplate: (template: ITemplateContent) => {
     try {
@@ -32,6 +32,6 @@ export function restoreSavedTemplate(): void {
   const template =
     savedId && Object.hasOwn(AVAILABLE_TEMPLATES, savedId)
       ? AVAILABLE_TEMPLATES[savedId]
-      : AVAILABLE_TEMPLATES.modern;
+      : AVAILABLE_TEMPLATES.professional;
   useTemplates.getState().setTemplate(template);
 }

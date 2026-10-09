@@ -6,8 +6,10 @@ import { SiCodechef } from 'react-icons/si';
 import { SiHackerearth } from 'react-icons/si';
 import { SiLeetcode } from 'react-icons/si';
 import { TbSwords } from 'react-icons/tb';
+import { BsGlobe } from 'react-icons/bs';
 
 export const socialIcons = new Map([
+  ['website', BsGlobe],
   ['linkedin', AiFillLinkedin],
   ['github', AiFillGithub],
   ['twitter', AiOutlineTwitter],

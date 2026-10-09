@@ -3,7 +3,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import dayjs from 'dayjs';
 import Color from 'color';
 import { describe, expect, it } from 'vitest';
-import ResumeData from '@/helpers/constants/resume-data.json';
+import ResumeData from '@/helpers/constants/resumes/Anonym.el.json';
 import { StandardExperience, TimelineExperience } from './experience';
 import { StandardEducation } from './education';
 import { BarSkills, ChipSkills, DotSkills, ListSkills } from './skills';
