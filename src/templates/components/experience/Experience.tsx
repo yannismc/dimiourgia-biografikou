@@ -6,12 +6,16 @@ import { formatDateRange, type DateLocale } from '../primitives/formatDateRange'
 import { useSurfacePalette, MONO_FONT } from '../theme';
 import type { ExperienceItem, ItemsProps } from '../types';
 
-type Props = ItemsProps<ExperienceItem> & { dateLocale?: DateLocale };
+type Props = ItemsProps<ExperienceItem> & {
+  dateLocale?: DateLocale;
+  yearOnlyIds?: readonly string[];
+};
 function Experience({
   items,
   title = 'Experience',
   density,
   dateLocale = 'en',
+  yearOnlyIds = [],
   design,
 }: Props & { design: 'standard' | 'stacked' | 'timeline' | 'technical' }) {
   const p = useSurfacePalette();
@@ -105,7 +109,13 @@ function Experience({
                   ...(design === 'technical' ? { fontFamily: font(MONO_FONT) } : {}),
                 }}
               >
-                {formatDateRange(item.startDate, item.endDate, item.isWorkingHere, dateLocale)}
+                {formatDateRange(
+                  item.startDate,
+                  item.endDate,
+                  item.isWorkingHere,
+                  dateLocale,
+                  yearOnlyIds.includes(item.id ?? '')
+                )}
                 {design === 'timeline' && item.years && (
                   <div style={{ textAlign: 'right' }}>{item.years}</div>
                 )}

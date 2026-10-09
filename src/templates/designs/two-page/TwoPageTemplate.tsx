@@ -15,10 +15,31 @@ import { AchievementsSection, AwardsSection } from '@/templates/components/award
 import { StandardEducation } from '@/templates/components/education';
 import { TimelineExperience } from '@/templates/components/experience';
 import { ExperienceProfile } from '@/templates/components/profile';
-import { BarSkills, ChipSkills } from '@/templates/components/skills';
+import { ChipSkills } from '@/templates/components/skills';
 import { ProfileSummarySection, TextSection } from '@/templates/components/text';
+import type { ExperienceItem } from '@/templates/components/types';
 import { ProjectsSection } from '@/templates/components/projects';
 import { TemplateRegion } from '@/templates/designs/integration/TemplateRegion';
+import { isResearchExperience, normalizeInstitution } from '@/templates/designs/registry/predicates';
+
+const languageDescriptors: Record<string, string> = {
+  ελληνικα: 'μητρική',
+  αγγλικα: 'C1',
+  γαλλικα: 'B1',
+  γερμανικα: 'βασικές γνώσεις',
+};
+
+function languageSummary(languages: readonly { name: string }[]) {
+  const text = languages
+    .map((language) => {
+      const name = language.name.trim();
+      const descriptor = languageDescriptors[normalizeInstitution(name)];
+      const safeName = name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return descriptor ? `${safeName} (${descriptor})` : safeName;
+    })
+    .join(' · ');
+  return text ? `<p>${text}</p>` : '';
+}
 
 function ResumePage({ children, pageNumber }: { children: ReactNode; pageNumber: number }) {
   const palette = useResumePalette();
@@ -116,19 +137,43 @@ export default function TwoPageTemplate() {
       case 'work':
         return (
           <TimelineExperience
-            items={data.work}
+            items={data.work.filter((item: ExperienceItem) => !isResearchExperience(item))}
             title="Επαγγελματική Εμπειρία"
             dateLocale="el"
             density="compact"
           />
         );
-      case 'tech_expertise':
+      case 'research_experience': {
+        const items = data.work.filter((item: ExperienceItem) => isResearchExperience(item));
+        const teiIds = items
+          .filter((item: ExperienceItem) => normalizeInstitution(item.name).includes('tei athin'))
+          .map((item: ExperienceItem) => item.id);
         return (
-          <BarSkills
-            items={data.skills.languages.concat(data.skills.frameworks)}
-            title={data.skills.frameworks.length ? 'Γλώσσες και Τεχνικές Γνώσεις' : 'Γλώσσες'}
+          <TimelineExperience
+            items={items}
+            title="Ερευνητική Εμπειρία"
+            dateLocale="el"
+            yearOnlyIds={teiIds}
             density="compact"
           />
+        );
+      }
+      case 'tech_expertise':
+        return (
+          <>
+            <TextSection
+              html={languageSummary(data.skills.languages)}
+              title="Γλώσσες"
+              density="compact"
+            />
+            {data.skills.frameworks.length > 0 && (
+              <ChipSkills
+                items={data.skills.frameworks}
+                title="Τεχνικές Γνώσεις"
+                density="compact"
+              />
+            )}
+          </>
         );
       case 'skills_exposure':
         return (
@@ -175,7 +220,14 @@ export default function TwoPageTemplate() {
           />
         );
       case 'awards':
-        return <AwardsSection items={data.awards} title="Πιστοποιήσεις" density="compact" />;
+        return (
+          <AwardsSection
+            items={data.awards}
+            title="Πιστοποιήσεις"
+            dateLocale="el"
+            density="compact"
+          />
+        );
       case 'publications':
         return (
           <TextSection

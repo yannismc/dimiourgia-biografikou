@@ -1,10 +1,15 @@
 import { spacing } from '@/helpers/resume-style/styles';
 import { SectionFrame } from '../primitives/SectionFrame';
 import { RichText } from '../primitives/RichText';
-import { formatDate } from '../primitives/formatDateRange';
+import { formatDate, type DateLocale } from '../primitives/formatDateRange';
 import { useSurfacePalette } from '../theme';
 import type { AwardItem, ItemsProps } from '../types';
-export function AwardsSection({ items, title = 'Awards', density }: ItemsProps<AwardItem>) {
+export function AwardsSection({
+  items,
+  title = 'Awards',
+  density,
+  dateLocale = 'en',
+}: ItemsProps<AwardItem> & { dateLocale?: DateLocale }) {
   const p = useSurfacePalette();
   if (!items.length) return null;
   return (
@@ -22,7 +27,7 @@ export function AwardsSection({ items, title = 'Awards', density }: ItemsProps<A
             }}
           >
             <span>{item.awarder}</span>
-            <span>{formatDate(item.date)}</span>
+            <span>{formatDate(item.date, dateLocale)}</span>
           </div>
           <RichText html={item.summary} p={p} />
         </div>

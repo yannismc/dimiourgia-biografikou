@@ -6,6 +6,23 @@ const hasLen = (v: unknown) => hasContent(v);
 export const basicsSummary = (r: any) => hasLen(r.basics?.summary);
 export const basicsObjective = (r: any) => hasLen(r.basics?.objective);
 export const work = (r: any) => hasLen(r.work);
+export const normalizeInstitution = (value: unknown) =>
+  String(value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('el');
+export const isResearchExperience = (item: any) => {
+  const institution = normalizeInstitution(item?.name);
+  return (
+    institution.includes('universite savoie mont blanc') ||
+    institution.includes('tei athin') ||
+    institution.includes('εργαστηριο ανανεωσιμων πηγων ενεργειας')
+  );
+};
+export const employmentExperience = (r: any) =>
+  hasLen((r.work ?? []).filter((item: any) => !isResearchExperience(item)));
+export const researchExperience = (r: any) =>
+  hasLen((r.work ?? []).filter(isResearchExperience));
 export const awards = (r: any) => hasLen(r.awards);
 export const education = (r: any) => hasLen(r.education);
 export const volunteer = (r: any) => hasLen(r.volunteer);
