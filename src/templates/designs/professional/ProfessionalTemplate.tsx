@@ -106,6 +106,8 @@ export default function ProfessionalTemplate() {
       <div
         style={{
           ...pageStyle(resumePalette),
+          height: 'auto',
+          minHeight: '100%',
           padding: padding('20px 25px'),
           display: 'grid',
           gridTemplateColumns: columns('minmax(0, 2fr) minmax(0, 1fr)', false, secondaryPercent),
