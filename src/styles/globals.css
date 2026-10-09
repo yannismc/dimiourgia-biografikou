@@ -63,7 +63,7 @@ body {
   display: flow-root;
 }
 .professional-right-region > :last-child {
-  margin-top: auto;
+  margin-top: var(--professional-bottom-offset, 0px);
 }
 @media print {
   .resume-a4-page {

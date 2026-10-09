@@ -1,7 +1,7 @@
 import { EditableResumeSection } from '@/helpers/common/components/EditableResumeSection';
 import { columns, padding, spacing } from '@/helpers/resume-style/styles';
 import { useResumeStyleStore } from '@/stores/useResumeStyleStore';
-import { useContext } from 'react';
+import { useContext, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { useSectionLayoutRuntime } from '@/helpers/section-layout';
 import { StateContext } from '@/modules/builder/resume/ResumeLayout';
 import { pageStyle } from '@/templates/components/primitives/layoutPrimitives';
@@ -20,6 +20,9 @@ export default function ProfessionalTemplate() {
   const data = useContext(StateContext);
   const { regions } = useSectionLayoutRuntime();
   const resumePalette = useResumePalette();
+  const layoutRef = useRef<HTMLDivElement>(null);
+  const bottomOffsetRef = useRef(0);
+  const [bottomOffset, setBottomOffset] = useState(0);
   const basics = data.basics;
   const profileBasics = {
     ...basics,
@@ -29,6 +32,39 @@ export default function ProfessionalTemplate() {
       ...(basics.profiles ?? []),
     ],
   };
+  useLayoutEffect(() => {
+    const root = layoutRef.current;
+    if (!root) return;
+    const left = root.querySelector('.professional-left-region');
+    const right = root.querySelector('.professional-right-region');
+    if (!left || !right || typeof ResizeObserver === 'undefined') return;
+
+    const alignFinalSections = () => {
+      const leftFinal = left.lastElementChild;
+      const rightFinal = right.lastElementChild;
+      if (!leftFinal || !rightFinal) return;
+      const rootScale = root.offsetWidth
+        ? root.getBoundingClientRect().width / root.offsetWidth
+        : 1;
+      const leftBottom = leftFinal.getBoundingClientRect().bottom;
+      const rightBottomWithoutOffset =
+        rightFinal.getBoundingClientRect().bottom - bottomOffsetRef.current * rootScale;
+      const nextOffset = (leftBottom - rightBottomWithoutOffset) / rootScale;
+      if (Math.abs(nextOffset - bottomOffsetRef.current) < 0.5) return;
+      bottomOffsetRef.current = nextOffset;
+      setBottomOffset(nextOffset);
+    };
+
+    alignFinalSections();
+    const observer = new ResizeObserver(alignFinalSections);
+    observer.observe(root);
+    observer.observe(left);
+    observer.observe(right);
+    left.querySelectorAll(':scope > *').forEach((section) => observer.observe(section));
+    right.querySelectorAll(':scope > *').forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, [data, regions, secondaryPercent]);
+
   const renderSection = (id: string) => {
     switch (id) {
       case 'work':
@@ -68,7 +104,13 @@ export default function ProfessionalTemplate() {
         return (
           <BarSkills
             items={data.skills.languages.concat(data.skills.frameworks)}
-            title="Τεχνικές Γνώσεις"
+            title={
+              data.skills.frameworks.length
+                ? data.skills.languages.length
+                  ? 'Γλώσσες και Τεχνικές Γνώσεις'
+                  : 'Τεχνικές Γνώσεις'
+                : 'Γλώσσες'
+            }
           />
         );
       case 'skills_exposure':
@@ -91,6 +133,7 @@ export default function ProfessionalTemplate() {
   return (
     <ResumePresentation value="boxed">
       <div
+        ref={layoutRef}
         style={{
           ...pageStyle(resumePalette),
           padding: padding('20px 25px'),
@@ -115,6 +158,7 @@ export default function ProfessionalTemplate() {
             items={regions.left}
             renderSection={renderSection}
             language="el"
+            className="professional-left-region"
           />
         </div>
         <TemplateRegion
@@ -123,7 +167,9 @@ export default function ProfessionalTemplate() {
           renderSection={renderSection}
           language="el"
           className="professional-right-region"
-          style={{ display: 'flex', flexDirection: 'column' }}
+          style={{
+            '--professional-bottom-offset': `${bottomOffset}px`,
+          } as CSSProperties}
         />
       </div>
     </ResumePresentation>
