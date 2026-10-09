@@ -74,7 +74,7 @@ const schema = {
     },
   ],
   awards: [{ id: '', title: '', awarder: '', date: null, summary: '' }],
-  activities: { involvements: '', achievements: '' },
+  activities: { involvements: '', achievements: '', publications: '' },
 } satisfies Schema;
 
 interface ImportedResume {

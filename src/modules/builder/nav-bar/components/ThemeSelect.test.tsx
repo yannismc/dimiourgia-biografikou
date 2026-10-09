@@ -11,7 +11,7 @@ beforeEach(() => {
 
 it('applies custom colours and retains them across preset switches and rehydration', async () => {
   render(<ThemeSelect />);
-  expect(screen.getAllByRole('button')).toHaveLength(2);
+  expect(screen.getAllByRole('button')).toHaveLength(4);
   fireEvent.click(screen.getByRole('button', { name: 'Custom colours' }));
   fireEvent.change(screen.getByLabelText('Headings colour'), { target: { value: '#123456' } });
   expect(useThemes.getState().selectedTheme.titleColor).toBe('#123456');

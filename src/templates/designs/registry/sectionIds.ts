@@ -8,6 +8,8 @@ export const REGION_IDS = {
   left: 'left',
   right: 'right',
   footer: 'footer',
+  page1: 'page1',
+  page2: 'page2',
   main: 'main',
   sidebar: 'sidebar',
 } as const;
@@ -33,4 +35,5 @@ export const SECTION_IDS = {
   stack: 'stack',
   skillsMerged: 'skills_merged',
   involvements: 'involvements',
+  publications: 'publications',
 } as const;

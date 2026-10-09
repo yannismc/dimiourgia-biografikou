@@ -22,6 +22,7 @@ export type TemplateRegistryEntry = {
   name: string;
   thumbnail: string;
   style: {
+    pages?: 2;
     secondaryColumnPercent?: number;
     padding: [number, number, number, number];
     section: number;

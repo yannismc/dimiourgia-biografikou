@@ -4,6 +4,7 @@ export interface IThemeColor {
   titleColor: string;
   highlighterColor: string;
   id: number;
+  name?: string;
 }
 
 export interface ITemplate {

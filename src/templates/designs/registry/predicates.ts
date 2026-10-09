@@ -9,6 +9,7 @@ export const education = (r: any) => hasLen(r.education);
 export const volunteer = (r: any) => hasLen(r.volunteer);
 export const involvement = (r: any) => hasLen(r.activities?.involvements);
 export const achievements = (r: any) => hasLen(r.activities?.achievements);
+export const publications = (r: any) => hasLen(r.activities?.publications);
 export const languages = (r: any) => hasLen(r.skills?.languages);
 export const technologies = (r: any) => hasLen(r.skills?.technologies);
 export const tools = (r: any) => hasLen(r.skills?.tools);

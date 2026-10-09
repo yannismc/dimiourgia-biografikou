@@ -9,6 +9,7 @@ export function PagedResume({ children }: { children: ReactNode }) {
   const settings = useResumeStyleStore((state) => state.settings);
   const templateId = useTemplates((state) => state.activeTemplate.id);
   const secondaryDefault = TEMPLATE_REGISTRY[templateId]?.style.secondaryColumnPercent;
+  const isMultiPage = TEMPLATE_REGISTRY[templateId]?.style.pages === 2;
   const variables = styleVariables(settings);
   if (
     secondaryDefault !== undefined &&
@@ -21,6 +22,15 @@ export function PagedResume({ children }: { children: ReactNode }) {
         settings.secondaryColumnPercent ?? secondaryDefault
       ),
     });
+  }
+  if (isMultiPage) {
+    return (
+      <div className="resume-pages">
+        <div className="resume-multi-page-content" style={variables}>
+          {children}
+        </div>
+      </div>
+    );
   }
   return (
     <div className="resume-pages">

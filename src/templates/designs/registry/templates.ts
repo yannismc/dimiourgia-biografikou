@@ -84,7 +84,7 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
     sectionLayout: {
       regionKeys: [REGION_IDS.left, REGION_IDS.right, REGION_IDS.footer],
       defaults: {
-        [REGION_IDS.left]: [SECTION_IDS.work, SECTION_IDS.involvement, SECTION_IDS.achievements],
+        [REGION_IDS.left]: [SECTION_IDS.work, SECTION_IDS.education, SECTION_IDS.achievements],
         [REGION_IDS.right]: [
           SECTION_IDS.summary,
           SECTION_IDS.objective,
@@ -93,7 +93,7 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
           SECTION_IDS.methodology,
           SECTION_IDS.tools,
         ],
-        [REGION_IDS.footer]: [SECTION_IDS.education],
+        [REGION_IDS.footer]: [SECTION_IDS.involvement],
       },
     },
     sectionRules: [
@@ -109,6 +109,55 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
       { sectionId: SECTION_IDS.education, when: has.education },
     ],
     loadComponent: () => import('@/templates/designs/professional/ProfessionalTemplate'),
+  },
+
+  'two-page': {
+    id: 'two-page',
+    style: {
+      pages: 2,
+      padding: [14, 18, 14, 18],
+      section: 9,
+      entry: 7,
+      column: 10,
+      body: 10,
+      heading: 11,
+      name: 23,
+      lineHeight: 1.3,
+    },
+    name: 'Αναλυτικό Βιογραφικό (2 σελίδες)',
+    thumbnail: '/templates/professional.webp',
+    sectionLayout: {
+      regionKeys: [REGION_IDS.page1, REGION_IDS.page2],
+      defaults: {
+        [REGION_IDS.page1]: [SECTION_IDS.summary, SECTION_IDS.objective, SECTION_IDS.work],
+        [REGION_IDS.page2]: [
+          SECTION_IDS.techExpertise,
+          SECTION_IDS.skillsExposure,
+          SECTION_IDS.methodology,
+          SECTION_IDS.tools,
+          SECTION_IDS.education,
+          SECTION_IDS.involvement,
+          SECTION_IDS.achievements,
+          SECTION_IDS.awards,
+          SECTION_IDS.publications,
+        ],
+      },
+    },
+    sectionRules: [
+      { sectionId: SECTION_IDS.summary, when: has.basicsSummary },
+      { sectionId: SECTION_IDS.objective, when: has.basicsObjective },
+      { sectionId: SECTION_IDS.work, when: has.work },
+      { sectionId: SECTION_IDS.techExpertise, when: has.techExpertise },
+      { sectionId: SECTION_IDS.skillsExposure, when: has.skillsExposure },
+      { sectionId: SECTION_IDS.methodology, when: has.practices },
+      { sectionId: SECTION_IDS.tools, when: has.tools },
+      { sectionId: SECTION_IDS.education, when: has.education },
+      { sectionId: SECTION_IDS.involvement, when: has.involvement },
+      { sectionId: SECTION_IDS.achievements, when: has.achievements },
+      { sectionId: SECTION_IDS.awards, when: has.awards },
+      { sectionId: SECTION_IDS.publications, when: has.publications },
+    ],
+    loadComponent: () => import('@/templates/designs/two-page/TwoPageTemplate'),
   },
 
   spotlight: {

@@ -37,6 +37,16 @@ export const useActivity = create<IActivityStore>()(
       updateAchievements: updateAchievements(set),
       updateInvolvements: updateInvolvements(set),
     }),
-    { name: 'activities' }
+    {
+      name: 'activities',
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as Partial<IActivityStore>;
+        return {
+          ...currentState,
+          ...persisted,
+          activities: { ...currentState.activities, ...persisted.activities },
+        };
+      },
+    }
   )
 );

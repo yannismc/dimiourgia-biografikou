@@ -1,6 +1,7 @@
 export interface IActivity {
   involvements: string;
   achievements: string;
+  publications: string;
 }
 
 export interface IActivityStore {

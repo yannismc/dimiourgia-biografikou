@@ -28,6 +28,8 @@ yarn-error.log*
 # local env files
 .env*.local
 /local/ResumeBuilder.el.json
+/local/ResumeBuilder.TwoPage.el.json
+/local/ResumeBuilder.GEKTERNA.el.json
 
 # vercel
 .vercel

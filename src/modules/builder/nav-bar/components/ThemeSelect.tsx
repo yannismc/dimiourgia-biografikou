@@ -35,7 +35,9 @@ export const ThemeSelect = () => {
             <button
               type="button"
               aria-label={
-                index === SYSTEM_COLORS.length ? 'Custom colours' : `Colour scheme ${index + 1}`
+                index === SYSTEM_COLORS.length
+                  ? 'Custom colours'
+                  : (themeObject.name ?? `Colour scheme ${index + 1}`)
               }
               aria-pressed={isActive}
               key={themeObject.id}
@@ -50,6 +52,7 @@ export const ThemeSelect = () => {
                 <ColorBox bgColor={themeObject.titleColor} />
                 <ColorBox bgColor={themeObject.highlighterColor} />
               </ColorBoxWrapper>
+              {themeObject.name && <span className="text-sm ml-3">{themeObject.name}</span>}
               {index === SYSTEM_COLORS.length && <span className="text-sm ml-3">Custom</span>}
               {isActive && (
                 <Image src={'/icons/selected-tick.svg'} alt="logo" width="28" height="20" />

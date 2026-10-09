@@ -46,7 +46,7 @@ const coverage: Record<string, Record<string, string[]>> = {
     ],
   },
   professional: {
-    left: ['work', 'involvement', 'achievements'],
+    left: ['work', 'education', 'achievements'],
     right: [
       'summary',
       'objective',
@@ -55,7 +55,21 @@ const coverage: Record<string, Record<string, string[]>> = {
       'methodology',
       'tools',
     ],
-    footer: ['education'],
+    footer: ['involvement'],
+  },
+  'two-page': {
+    page1: ['summary', 'objective', 'work'],
+    page2: [
+      'tech_expertise',
+      'skills_exposure',
+      'methodology',
+      'tools',
+      'education',
+      'involvement',
+      'achievements',
+      'awards',
+      'publications',
+    ],
   },
   classic: { main: ['summary', 'work', 'education', 'skills'] },
   'sidebar-left': { sidebar: ['skills', 'education'], main: ['summary', 'work', 'awards'] },
@@ -94,11 +108,20 @@ const markers: Record<string, string> = {
   skills_exposure: 'Firebase',
   methodology: 'Agile methodology',
   stack: 'Firebase',
+  publications: 'publications-marker',
 };
 const data = {
   ...ResumeData,
   basics: { ...ResumeData.basics, summary: 'summary-marker', objective: 'objective-marker' },
-  activities: { involvements: 'projects-marker', achievements: 'achievements-marker' },
+  skills: { ...ResumeData.skills, practices: [{ name: 'Agile methodology', level: 1 }] },
+  activities: {
+    involvements: 'projects-marker',
+    achievements: 'achievements-marker',
+    publications: 'publications-marker',
+  },
+  awards: [
+    { id: 'test-award', title: 'Certificate of exceptional bug finder', awarder: 'Test', date: null, summary: '' },
+  ],
 };
 const theme = createTheme();
 Object.assign(theme, {
