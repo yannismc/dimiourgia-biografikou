@@ -230,7 +230,7 @@ export default function TwoPageTemplate() {
         return (
           <TextSection
             html={data.activities.publications}
-            title="Δημοσιεύσεις"
+            title="Επιλεγμένες δημοσιεύσεις"
             density="compact"
           />
         );
