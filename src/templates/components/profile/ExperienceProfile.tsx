@@ -10,12 +10,18 @@ type Labels = {
   totalExperience: string;
 };
 
+const DEFAULT_LABELS: Labels = {
+  profile: 'Profile',
+  relevantExperience: 'Relevant experience',
+  totalExperience: 'Total experience',
+};
+
 export function ExperienceProfile({
   basics,
-  labels,
+  labels = DEFAULT_LABELS,
 }: {
   basics: ProfileBasics;
-  labels: Labels;
+  labels?: Labels;
 }) {
   const p = useSurfacePalette();
   return (
