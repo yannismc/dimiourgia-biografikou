@@ -1,14 +1,15 @@
 import { font, bodySize, spacing } from '@/helpers/resume-style/styles';
 import { SectionFrame } from '../primitives/SectionFrame';
-import { formatDateRange } from '../primitives/formatDateRange';
+import { formatDateRange, type DateLocale } from '../primitives/formatDateRange';
 import { useSurfacePalette, MONO_FONT } from '../theme';
 import type { EducationItem, ItemsProps } from '../types';
 
-type Props = ItemsProps<EducationItem>;
+type Props = ItemsProps<EducationItem> & { dateLocale?: DateLocale };
 function Education({
   items,
   title = 'Education',
   density,
+  dateLocale = 'en',
   design,
 }: Props & { design: 'standard' | 'compact' | 'technical' }) {
   const p = useSurfacePalette();
@@ -39,7 +40,9 @@ function Education({
             }}
           >
             <span style={{ fontWeight: 400 }}>{item.institution}</span>
-            <span>{formatDateRange(item.startDate, item.endDate, item.isStudyingHere)}</span>
+            <span>
+              {formatDateRange(item.startDate, item.endDate, item.isStudyingHere, dateLocale)}
+            </span>
           </div>
         </div>
       ))}

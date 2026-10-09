@@ -4,11 +4,23 @@ import { SocialIconsRow } from '../primitives/Contact';
 import { SectionFrame } from '../primitives/SectionFrame';
 import { useSurfacePalette } from '../theme';
 import type { ProfileBasics } from '../types';
-export function ExperienceProfile({ basics }: { basics: ProfileBasics }) {
+type Labels = {
+  profile: string;
+  relevantExperience: string;
+  totalExperience: string;
+};
+
+export function ExperienceProfile({
+  basics,
+  labels,
+}: {
+  basics: ProfileBasics;
+  labels: Labels;
+}) {
   const p = useSurfacePalette();
   return (
     <SectionFrame
-      title={basics.name || 'Profile'}
+      title={basics.name || labels.profile}
       heading="profile"
       headerActions={
         basics.profiles?.some((profile) => profile.url) ? (
@@ -29,8 +41,16 @@ export function ExperienceProfile({ basics }: { basics: ProfileBasics }) {
           <div style={{ color: p.primary, fontSize: bodySize(14), fontWeight: 500 }}>
             {basics.label}
           </div>
-          {basics.relExp && <div>Relevant experience: {basics.relExp}</div>}
-          {basics.totalExp && <div>Total experience: {basics.totalExp}</div>}
+          {basics.relExp && (
+            <div>
+              {labels.relevantExperience}: {basics.relExp}
+            </div>
+          )}
+          {basics.totalExp && (
+            <div>
+              {labels.totalExperience}: {basics.totalExp}
+            </div>
+          )}
         </div>
         <div style={{ marginLeft: 'auto', minWidth: 0, maxWidth: '100%' }}>
           <ContactList basics={{ ...basics, profiles: [] }} density="comfortable" align="right" />

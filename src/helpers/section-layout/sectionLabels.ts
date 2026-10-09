@@ -28,6 +28,19 @@ const SECTION_LABELS: Record<string, string> = {
   skills_list: 'Skills',
 };
 
+const GREEK_SECTION_LABELS: Record<string, string> = {
+  summary: 'Επαγγελματικό Προφίλ',
+  work: 'Επαγγελματική Εμπειρία',
+  objective: 'Επαγγελματικός Στόχος',
+  education: 'Εκπαίδευση',
+  involvement: 'Έργα και Δραστηριότητες',
+  achievements: 'Πιστοποιήσεις και Διακρίσεις',
+  tech_expertise: 'Τεχνικές Γνώσεις',
+  skills_exposure: 'Δεξιότητες και Τεχνολογίες',
+  methodology: 'Μεθοδολογίες και Πρακτικές',
+  tools: 'Εργαλεία',
+};
+
 function toTitleCase(value: string): string {
   return value
     .split('_')
@@ -36,6 +49,7 @@ function toTitleCase(value: string): string {
     .join(' ');
 }
 
-export function getSectionDisplayName(sectionId: string): string {
+export function getSectionDisplayName(sectionId: string, language: 'en' | 'el' = 'en'): string {
+  if (language === 'el') return GREEK_SECTION_LABELS[sectionId] ?? toTitleCase(sectionId);
   return SECTION_LABELS[sectionId] ?? toTitleCase(sectionId);
 }

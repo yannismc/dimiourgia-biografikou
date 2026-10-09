@@ -24,45 +24,58 @@ export default function ProfessionalTemplate() {
   const renderSection = (id: string) => {
     switch (id) {
       case 'work':
-        return <TimelineExperience items={data.work} title="Work Experience" />;
+        return (
+          <TimelineExperience
+            items={data.work}
+            title="Επαγγελματική Εμπειρία"
+            dateLocale="el"
+          />
+        );
       case 'involvement':
         return (
           <ProjectsSection
             html={data.activities.involvements}
-            title="Key Projects / Involvements"
+            title="Έργα και Δραστηριότητες"
           />
         );
       case 'achievements':
         return (
           <AchievementsSection
             html={data.activities.achievements}
-            title="Certificates and Awards"
+            title="Πιστοποιήσεις και Διακρίσεις"
           />
         );
       case 'summary':
-        return <ProfileSummarySection html={basics.summary} image={basics.image} />;
+        return (
+          <ProfileSummarySection
+            html={basics.summary}
+            image={basics.image}
+            imageAlt="Φωτογραφία προφίλ"
+            title="Επαγγελματικό Προφίλ"
+          />
+        );
       case 'objective':
-        return <TextSection html={basics.objective} title="Career Objective" />;
+        return <TextSection html={basics.objective} title="Επαγγελματικός Στόχος" />;
       case 'tech_expertise':
         return (
           <BarSkills
             items={data.skills.languages.concat(data.skills.frameworks)}
-            title="Technical expertise"
+            title="Τεχνικές Γνώσεις"
           />
         );
       case 'skills_exposure':
         return (
           <ChipSkills
             items={data.skills.technologies.concat(data.skills.libraries, data.skills.databases)}
-            title="Skills / Exposure"
+            title="Δεξιότητες και Τεχνολογίες"
           />
         );
       case 'methodology':
-        return <ChipSkills items={data.skills.practices} title="Practices" />;
+        return <ChipSkills items={data.skills.practices} title="Μεθοδολογίες και Πρακτικές" />;
       case 'tools':
-        return <ChipSkills items={data.skills.tools} title="Tools" />;
+        return <ChipSkills items={data.skills.tools} title="Εργαλεία" />;
       case 'education':
-        return <StandardEducation items={data.education} />;
+        return <StandardEducation items={data.education} title="Εκπαίδευση" dateLocale="el" />;
       default:
         return null;
     }
@@ -80,11 +93,28 @@ export default function ProfessionalTemplate() {
       >
         <div style={{ minWidth: 0 }}>
           <EditableResumeSection id="basics">
-            <ExperienceProfile basics={basics} />
+            <ExperienceProfile
+              basics={basics}
+              labels={{
+                profile: 'Προφίλ',
+                relevantExperience: 'Συναφής προϋπηρεσία',
+                totalExperience: 'Συνολική προϋπηρεσία',
+              }}
+            />
           </EditableResumeSection>
-          <TemplateRegion regionId="left" items={regions.left} renderSection={renderSection} />
+          <TemplateRegion
+            regionId="left"
+            items={regions.left}
+            renderSection={renderSection}
+            language="el"
+          />
         </div>
-        <TemplateRegion regionId="right" items={regions.right} renderSection={renderSection} />
+        <TemplateRegion
+          regionId="right"
+          items={regions.right}
+          renderSection={renderSection}
+          language="el"
+        />
       </div>
     </ResumePresentation>
   );

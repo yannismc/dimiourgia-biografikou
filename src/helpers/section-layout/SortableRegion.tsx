@@ -12,12 +12,14 @@ export const ResumeSortableRegionContext = createContext<string>('');
 export function SortableRegion({
   regionId,
   items,
+  language = 'en',
   className,
   style,
   children,
 }: {
   regionId: string;
   items: string[];
+  language?: 'en' | 'el';
   className?: string;
   style?: React.CSSProperties;
   children: (sectionId: string) => ReactNode;
@@ -48,7 +50,7 @@ export function SortableRegion({
                   : 'border-gray-300 text-gray-400'
               }`}
             >
-              Drop sections here
+              {language === 'el' ? 'Αποθέστε ενότητες εδώ' : 'Drop sections here'}
             </p>
           )}
         </div>

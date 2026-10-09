@@ -9,7 +9,15 @@ import { getSectionDisplayName } from '@/helpers/section-layout/sectionLabels';
 import { ResumeSortableRegionContext } from '@/helpers/section-layout/SortableRegion';
 import { useSectionLayoutStore } from '@/stores/useSectionLayoutStore';
 
-export function SortableTemplateSection({ id, children }: { id: string; children: ReactNode }) {
+export function SortableTemplateSection({
+  id,
+  children,
+  language = 'en',
+}: {
+  id: string;
+  children: ReactNode;
+  language?: 'en' | 'el';
+}) {
   const regionId = useContext(ResumeSortableRegionContext);
   const isReorderMode = useSectionLayoutStore((state) => state.isReorderMode);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -18,7 +26,8 @@ export function SortableTemplateSection({ id, children }: { id: string; children
     data: { resumeRegion: regionId },
   });
 
-  const sectionName = getSectionDisplayName(id);
+  const sectionName = getSectionDisplayName(id, language);
+  const reorderLabel = language === 'el' ? 'Σύρετε για αναδιάταξη' : 'Drag to reorder';
 
   // While dragging, the real node stays as layout placeholder only; DragOverlay shows preview.
   const style = {
@@ -40,7 +49,7 @@ export function SortableTemplateSection({ id, children }: { id: string; children
               ? 'border-dashed border-[#1890ff]/70 bg-[#1890ff]/12 text-resume-500'
               : 'shadow-sm'
           }`}
-          aria-label={`Drag to reorder ${sectionName}`}
+          aria-label={`${reorderLabel} ${sectionName}`}
           {...attributes}
           {...listeners}
         >

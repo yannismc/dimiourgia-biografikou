@@ -6,32 +6,37 @@ import { ResumeSurface, useSurfacePalette, type Surface } from '../../components
 export function TemplateRegion({
   surface = 'page',
   renderSection,
+  language = 'en',
   ...props
 }: Omit<ComponentProps<typeof SortableRegion>, 'children'> & {
   surface?: Surface;
+  language?: 'en' | 'el';
   renderSection: (id: string) => React.ReactNode;
 }) {
   return (
     <ResumeSurface surface={surface}>
-      <RegionContents {...props} renderSection={renderSection} />
+      <RegionContents {...props} language={language} renderSection={renderSection} />
     </ResumeSurface>
   );
 }
 
 function RegionContents({
   renderSection,
+  language = 'en',
   ...props
 }: Omit<ComponentProps<typeof SortableRegion>, 'children'> & {
+  language?: 'en' | 'el';
   renderSection: (id: string) => React.ReactNode;
 }) {
   const palette = useSurfacePalette();
   return (
     <SortableRegion
       {...props}
+      language={language}
       style={{ minWidth: 0, color: palette.text, background: palette.bg, ...props.style }}
     >
       {(id) => (
-        <SortableTemplateSection key={id} id={id}>
+        <SortableTemplateSection key={id} id={id} language={language}>
           {renderSection(id)}
         </SortableTemplateSection>
       )}

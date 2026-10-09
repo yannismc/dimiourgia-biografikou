@@ -79,7 +79,7 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
       lineHeight: 1.5,
       secondaryColumnPercent: 33.333333333333336,
     },
-    name: 'Professional Resume',
+    name: 'Επαγγελματικό Βιογραφικό',
     thumbnail: '/templates/professional.webp',
     sectionLayout: {
       regionKeys: [REGION_IDS.left, REGION_IDS.right],

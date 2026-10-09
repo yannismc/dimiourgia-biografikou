@@ -2,15 +2,16 @@ import { font, bodySize, spacing } from '@/helpers/resume-style/styles';
 import { JobHeader } from '../primitives/layoutPrimitives';
 import { RichText } from '../primitives/RichText';
 import { SectionFrame } from '../primitives/SectionFrame';
-import { formatDateRange } from '../primitives/formatDateRange';
+import { formatDateRange, type DateLocale } from '../primitives/formatDateRange';
 import { useSurfacePalette, MONO_FONT } from '../theme';
 import type { ExperienceItem, ItemsProps } from '../types';
 
-type Props = ItemsProps<ExperienceItem>;
+type Props = ItemsProps<ExperienceItem> & { dateLocale?: DateLocale };
 function Experience({
   items,
   title = 'Experience',
   density,
+  dateLocale = 'en',
   design,
 }: Props & { design: 'standard' | 'stacked' | 'timeline' | 'technical' }) {
   const p = useSurfacePalette();
@@ -69,7 +70,7 @@ function Experience({
             <JobHeader
               position={item.position}
               company={item.name}
-              date={formatDateRange(item.startDate, item.endDate, item.isWorkingHere)}
+              date={formatDateRange(item.startDate, item.endDate, item.isWorkingHere, dateLocale)}
               p={p}
               compact={density === 'compact'}
             />
@@ -104,7 +105,7 @@ function Experience({
                   ...(design === 'technical' ? { fontFamily: font(MONO_FONT) } : {}),
                 }}
               >
-                {formatDateRange(item.startDate, item.endDate, item.isWorkingHere)}
+                {formatDateRange(item.startDate, item.endDate, item.isWorkingHere, dateLocale)}
                 {design === 'timeline' && item.years && (
                   <div style={{ textAlign: 'right' }}>{item.years}</div>
                 )}

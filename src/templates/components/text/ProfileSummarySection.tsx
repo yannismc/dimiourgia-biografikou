@@ -8,8 +8,9 @@ export function ProfileSummarySection({
   html,
   image,
   title = 'Summary',
+  imageAlt = 'Profile',
   density,
-}: TextProps & { image?: string }) {
+}: TextProps & { image?: string; imageAlt?: string }) {
   const p = useSurfacePalette();
   if (!hasContent(html)) return null;
   return (
@@ -18,7 +19,7 @@ export function ProfileSummarySection({
         {image && (
           <img
             src={image}
-            alt="Profile"
+            alt={imageAlt}
             style={{
               float: 'left',
               width: 80,
