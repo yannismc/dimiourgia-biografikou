@@ -89,7 +89,14 @@ export default function ProfessionalTemplate() {
       case 'tools':
         return <ChipSkills items={data.skills.tools} title="Εργαλεία" />;
       case 'education':
-        return <StandardEducation items={data.education} title="Εκπαίδευση" dateLocale="el" />;
+        return (
+          <StandardEducation
+            items={data.education}
+            title="Εκπαίδευση"
+            dateLocale="el"
+            institutionInline
+          />
+        );
       default:
         return null;
     }
@@ -102,7 +109,7 @@ export default function ProfessionalTemplate() {
           padding: padding('20px 25px'),
           display: 'grid',
           gridTemplateColumns: columns('minmax(0, 2fr) minmax(0, 1fr)', false, secondaryPercent),
-          gridTemplateRows: 'minmax(0, 1fr) auto',
+          gridTemplateRows: 'auto auto',
           gap: spacing('column', 14),
         }}
       >
