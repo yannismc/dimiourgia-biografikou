@@ -24,7 +24,8 @@ function ResumePage({ children, pageNumber }: { children: ReactNode; pageNumber:
   const palette = useResumePalette();
   const pageRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
+  const fitFactorRef = useRef(1);
+  const [fitFactor, setFitFactor] = useState(1);
 
   useLayoutEffect(() => {
     const page = pageRef.current;
@@ -32,10 +33,21 @@ function ResumePage({ children, pageNumber }: { children: ReactNode; pageNumber:
     if (!page || !content) return;
 
     const fitPage = () => {
-      const availableHeight = page.clientHeight;
+      const pageStyle = window.getComputedStyle(page);
+      const verticalPadding =
+        Number.parseFloat(pageStyle.paddingTop) + Number.parseFloat(pageStyle.paddingBottom);
+      const availableHeight = page.clientHeight - verticalPadding;
       const contentHeight = content.scrollHeight;
-      if (availableHeight > 0 && contentHeight > 0) {
-        setScale(Math.min(1, availableHeight / contentHeight));
+      if (availableHeight > 0 && contentHeight > availableHeight + 1) {
+        const nextFactor =
+          fitFactorRef.current * (availableHeight / contentHeight) * 0.995;
+        if (nextFactor < fitFactorRef.current - 0.001) {
+          fitFactorRef.current = nextFactor;
+          setFitFactor(nextFactor);
+        }
+      } else if (contentHeight < availableHeight * 0.75 && fitFactorRef.current < 1) {
+        fitFactorRef.current = 1;
+        setFitFactor(1);
       }
     };
 
@@ -68,9 +80,9 @@ function ResumePage({ children, pageNumber }: { children: ReactNode; pageNumber:
         <div
           ref={contentRef}
           style={{
-            transform: scale < 1 ? `scale(${scale})` : undefined,
-            transformOrigin: 'top center',
-          }}
+            width: '100%',
+            '--resume-fit-scale': fitFactor,
+          } as CSSProperties}
         >
           {children}
         </div>
@@ -184,7 +196,8 @@ export default function TwoPageTemplate() {
           <ExperienceProfile
             basics={profileBasics}
             photo={basics.image}
-            websiteUrl={basics.url}
+            subtitle={basics.relExp}
+            websiteUrl={basics.totalExp || basics.url}
             showExperienceMetrics={false}
             labels={{
               profile: 'Προφίλ',

@@ -23,8 +23,9 @@ export const HTMLRenderer = ({ htmlString }: { htmlString: string }) => {
       style={{
         // Keep the existing uncustomized text-xs geometry, but let the resume's
         // global controls reach the wrapper instead of stopping at its parent.
-        fontSize: 'var(--resume-body, 0.75rem)',
-        lineHeight: 'var(--resume-line-height, calc(1rem * var(--resume-line-factor, 1)))',
+        fontSize: 'calc(var(--resume-body, 0.75rem) * var(--resume-fit-scale, 1))',
+        lineHeight:
+          'calc(var(--resume-line-height, calc(1rem * var(--resume-line-factor, 1))) * var(--resume-fit-scale, 1))',
       }}
     >
       {parsedElement}

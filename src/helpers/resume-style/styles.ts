@@ -76,13 +76,14 @@ export const fontFamilies = {
   mono: 'Courier New, monospace',
 };
 export const font = (original: string) => `var(--resume-font, ${original})`;
-export const bodySize = (original: number) => `calc(var(--resume-body, 11px) * ${original / 11})`;
+export const bodySize = (original: number) =>
+  `calc(var(--resume-body, 11px) * ${original / 11} * var(--resume-fit-scale, 1))`;
 export const roleSize = (role: 'heading' | 'name', original: number) =>
-  `var(--resume-${role}, ${original}px)`;
+  `calc(var(--resume-${role}, ${original}px) * var(--resume-fit-scale, 1))`;
 export const lineHeight = (original: number) =>
-  `clamp(1.1, var(--resume-line-height, calc(${original} * var(--resume-line-factor, 1))), 1.8)`;
+  `clamp(1.1, calc(var(--resume-line-height, calc(${original} * var(--resume-line-factor, 1))) * var(--resume-fit-scale, 1)), 1.8)`;
 export const spacing = (role: 'section' | 'entry' | 'column', original: number) =>
-  `clamp(0px, var(--resume-${role}, calc(${original}px * var(--resume-density, 1))), 40px)`;
+  `clamp(0px, calc(var(--resume-${role}, calc(${original}px * var(--resume-density, 1))) * var(--resume-fit-scale, 1)), 40px)`;
 export const padding = (original: CSSProperties['padding']) =>
   `var(--resume-padding, ${typeof original === 'number' ? `${original}px` : original})`;
 export const sideString = (sides: Sides, unit: string) =>

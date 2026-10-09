@@ -21,12 +21,14 @@ export function ExperienceProfile({
   basics,
   labels = DEFAULT_LABELS,
   photo,
+  subtitle,
   websiteUrl,
   showExperienceMetrics = true,
 }: {
   basics: ProfileBasics;
   labels?: Labels;
   photo?: string;
+  subtitle?: string;
   websiteUrl?: string;
   showExperienceMetrics?: boolean;
 }) {
@@ -68,6 +70,11 @@ export function ExperienceProfile({
             <div style={{ color: p.primary, fontSize: bodySize(14), fontWeight: 500 }}>
               {basics.label}
             </div>
+            {subtitle && (
+              <div style={{ color: p.muted, fontSize: bodySize(11), overflowWrap: 'anywhere' }}>
+                {subtitle}
+              </div>
+            )}
             {websiteUrl && (
               <ContactLine
                 icon={<BsGlobe />}
