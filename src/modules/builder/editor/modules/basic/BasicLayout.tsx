@@ -3,6 +3,8 @@ import React, { Fragment } from 'react';
 import { useBasicDetails } from '@/stores/basic';
 import BasicHeader from './components/BasicHeader';
 import BasicPanel from './components/BasicPanel';
+import { SectionVisibilityControl } from '@/modules/builder/editor/components/SectionVisibilityControl';
+import { SECTION_IDS } from '@/templates/designs/registry/sectionIds';
 
 const tabTitles = ['Contacts', 'Links', 'About'];
 
@@ -24,6 +26,12 @@ const BasicLayout = () => {
         changeActiveTab={changeActiveTab}
         tabTitles={tabTitles}
       ></BasicHeader>
+      {activeTab === 0 && (
+        <SectionVisibilityControl sectionId={SECTION_IDS.contactInfo} label="Contact details" />
+      )}
+      {activeTab === 1 && (
+        <SectionVisibilityControl sectionId={SECTION_IDS.links} label="Links and profiles" />
+      )}
       <BasicPanel
         activeTab={activeTab}
         basicTabs={basicTabs}

@@ -26,6 +26,46 @@ export const SYSTEM_COLORS: IThemeColor[] = [
     id: 6,
     name: 'Website dark',
   },
+  {
+    backgroundColor: '#ffffff',
+    fontColor: '#243447',
+    titleColor: '#164e63',
+    highlighterColor: '#0e7490',
+    id: 7,
+    name: 'Ocean blue',
+  },
+  {
+    backgroundColor: '#ffffff',
+    fontColor: '#26352e',
+    titleColor: '#22543d',
+    highlighterColor: '#2f855a',
+    id: 8,
+    name: 'Forest green',
+  },
+  {
+    backgroundColor: '#ffffff',
+    fontColor: '#382b2d',
+    titleColor: '#702f3b',
+    highlighterColor: '#b65b66',
+    id: 9,
+    name: 'Burgundy',
+  },
+  {
+    backgroundColor: '#ffffff',
+    fontColor: '#2d3440',
+    titleColor: '#293241',
+    highlighterColor: '#d97706',
+    id: 10,
+    name: 'Charcoal and amber',
+  },
+  {
+    backgroundColor: '#ffffff',
+    fontColor: '#322b3d',
+    titleColor: '#493267',
+    highlighterColor: '#8055a6',
+    id: 11,
+    name: 'Plum',
+  },
 ];
 
 /** Built from `src/templates/designs/registry/templates.ts` — add templates there. */

@@ -27,6 +27,14 @@ const updateInvolvements = (set: SetState<IActivityStore>) => (involvements: str
   );
 };
 
+const updatePublications = (set: SetState<IActivityStore>) => (publications: string) => {
+  set(
+    produce((state: IActivityStore) => {
+      state.activities.publications = publications;
+    })
+  );
+};
+
 export const useActivity = create<IActivityStore>()(
   persist(
     (set, get) => ({
@@ -36,6 +44,7 @@ export const useActivity = create<IActivityStore>()(
       reset: setAllAwards(set),
       updateAchievements: updateAchievements(set),
       updateInvolvements: updateInvolvements(set),
+      updatePublications: updatePublications(set),
     }),
     {
       name: 'activities',

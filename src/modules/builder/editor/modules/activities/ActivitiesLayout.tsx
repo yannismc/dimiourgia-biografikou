@@ -6,10 +6,14 @@ import BasicHeader from './components/BasicHeader';
 import BasicPanel from './components/BasicPanel';
 import Involvements from './components/Involvements';
 import { ReactNode } from 'react';
+import Publications from './components/Publications';
+import { SectionVisibilityControl } from '@/modules/builder/editor/components/SectionVisibilityControl';
+import { SECTION_IDS } from '@/templates/designs/registry/sectionIds';
 
 export interface IActivityTab {
   key: string;
   label: string;
+  sectionId: string;
   component: () => ReactNode;
 }
 
@@ -21,18 +25,27 @@ const allActivityTabs: IAllActivityTabs = {
   involvements: {
     key: 'involvements',
     label: 'Involvements',
+    sectionId: SECTION_IDS.involvement,
     component: Involvements,
   },
   achievements: {
     key: 'achievements',
     label: 'Achievements',
+    sectionId: SECTION_IDS.achievements,
     component: Achievements,
+  },
+  publications: {
+    key: 'publications',
+    label: 'Publications',
+    sectionId: SECTION_IDS.publications,
+    component: Publications,
   },
 };
 
 const ActivitiesLayout = () => {
   const [activeTab, setActiveTab] = useState(
-    allActivityTabs[useEditorStore.getState().target.panel ?? 'involvements']
+    allActivityTabs[useEditorStore.getState().target.panel ?? 'involvements'] ??
+      allActivityTabs.involvements
   );
 
   const changeActiveTab = (_event: SyntheticEvent, key: string) => {
@@ -49,6 +62,9 @@ const ActivitiesLayout = () => {
         changeActiveTab={changeActiveTab}
         tabs={allActivityTabs}
       ></BasicHeader>
+      {activeTab && (
+        <SectionVisibilityControl sectionId={activeTab.sectionId} label={activeTab.label} />
+      )}
       <BasicPanel activeTab={activeTab} />
     </Fragment>
   );

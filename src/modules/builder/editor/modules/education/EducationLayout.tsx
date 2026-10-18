@@ -4,6 +4,7 @@ import AddEducation from './components/AddEducation';
 import Education from './components/Education';
 
 import MoveEditSection from '@/helpers/common/components/MoveEditSectionContainer';
+import { SectionVisibilityControl } from '@/modules/builder/editor/components/SectionVisibilityControl';
 
 const EducationLayout = () => {
   const allAcademics = useEducations((state) => state.academics);
@@ -19,6 +20,7 @@ const EducationLayout = () => {
 
   return (
     <div className="flex flex-col gap-8 mb-8">
+      <SectionVisibilityControl sectionId="education" label="Education" />
       {allAcademics.map((education, index) => (
         <MoveEditSection
           key={education.id}

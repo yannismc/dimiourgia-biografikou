@@ -4,6 +4,7 @@ import AddAward from './components/AddAward';
 import AwardComponent from './components/Award';
 
 import MoveEditSection from '@/helpers/common/components/MoveEditSectionContainer';
+import { SectionVisibilityControl } from '@/modules/builder/editor/components/SectionVisibilityControl';
 
 const AwardsLayout = () => {
   const allAwards = useAwards((state) => state.awards);
@@ -19,6 +20,7 @@ const AwardsLayout = () => {
 
   return (
     <div className="flex flex-col gap-8 mb-8">
+      <SectionVisibilityControl sectionId="awards" label="Awards" />
       {allAwards.map((award, index) => (
         <MoveEditSection
           key={award.id}

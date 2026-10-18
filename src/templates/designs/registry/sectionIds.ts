@@ -16,6 +16,8 @@ export const REGION_IDS = {
 
 export const SECTION_IDS = {
   summary: 'summary',
+  contactInfo: 'contact_info',
+  links: 'links',
   work: 'work',
   researchExperience: 'research_experience',
   awards: 'awards',

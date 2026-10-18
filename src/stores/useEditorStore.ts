@@ -17,6 +17,7 @@ export const previewEditorTargets: Record<string, EditorTarget> = {
   involvements: { section: 'activities', panel: 'involvements' },
   projects: { section: 'activities', panel: 'involvements' },
   achievements: { section: 'activities', panel: 'achievements' },
+  publications: { section: 'activities', panel: 'publications' },
   languages: { section: 'skills-and-expertise', panel: 'Languages' },
   technologies: { section: 'skills-and-expertise', panel: 'Technologies' },
   frameworks_libs: { section: 'skills-and-expertise', panel: 'Frameworks' },

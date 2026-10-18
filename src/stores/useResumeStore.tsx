@@ -19,7 +19,7 @@ import { useVoluteeringStore } from './volunteering';
 import { useMemo } from 'react';
 
 export const useResumeStore = () => {
-  const basics = useBasicDetails((state) => state.values);
+  const storedBasics = useBasicDetails((state) => state.values);
   const work = useExperiences((state) => state.experiences);
   const education = useEducations((state) => state.academics);
   const awards = useAwards((state) => state.awards);
@@ -34,24 +34,76 @@ export const useResumeStore = () => {
   const practices = usePractices((state) => state.get());
   const tools = useTools((state) => state.get());
   const activities = useActivity((state) => state.get());
+  const sectionVisibility = useSectionLayoutStore((state) => state.sectionVisibility);
+
+  const basics = useMemo(
+    () => ({
+      ...storedBasics,
+      summary: sectionVisibility.summary === false ? '' : storedBasics.summary,
+      objective: sectionVisibility.objective === false ? '' : storedBasics.objective,
+      email: sectionVisibility.contact_info === false ? '' : storedBasics.email,
+      phone: sectionVisibility.contact_info === false ? '' : storedBasics.phone,
+      url: sectionVisibility.contact_info === false ? '' : storedBasics.url,
+      location:
+        sectionVisibility.contact_info === false
+          ? {
+              ...storedBasics.location,
+              address: '',
+              postalCode: '',
+              city: '',
+              countryCode: '',
+              region: '',
+            }
+          : storedBasics.location,
+      relExp: sectionVisibility.contact_info === false ? '' : storedBasics.relExp,
+      totalExp: sectionVisibility.contact_info === false ? '' : storedBasics.totalExp,
+      profiles: sectionVisibility.links === false ? [] : storedBasics.profiles,
+    }),
+    [storedBasics, sectionVisibility]
+  );
+  const visibleWork = useMemo(
+    () => (sectionVisibility.work === false ? [] : work),
+    [sectionVisibility.work, work]
+  );
+  const visibleEducation = useMemo(
+    () => (sectionVisibility.education === false ? [] : education),
+    [sectionVisibility.education, education]
+  );
+  const visibleAwards = useMemo(
+    () => (sectionVisibility.awards === false ? [] : awards),
+    [sectionVisibility.awards, awards]
+  );
+  const visibleVolunteer = useMemo(
+    () => (sectionVisibility.volunteer === false ? [] : volunteer),
+    [sectionVisibility.volunteer, volunteer]
+  );
+  const visibleActivities = useMemo(
+    () => ({
+      ...activities,
+      involvements: sectionVisibility.involvement === false ? '' : activities.involvements,
+      achievements: sectionVisibility.achievements === false ? '' : activities.achievements,
+      publications: sectionVisibility.publications === false ? '' : activities.publications,
+    }),
+    [activities, sectionVisibility]
+  );
 
   return useMemo(
     () => ({
       ...ResumeData,
       basics,
-      work,
-      education,
-      awards,
-      volunteer,
+      work: visibleWork,
+      education: visibleEducation,
+      awards: visibleAwards,
+      volunteer: visibleVolunteer,
       skills: { languages, frameworks, technologies, libraries, databases, practices, tools },
-      activities,
+      activities: visibleActivities,
     }),
     [
       basics,
-      work,
-      education,
-      awards,
-      volunteer,
+      visibleWork,
+      visibleEducation,
+      visibleAwards,
+      visibleVolunteer,
       languages,
       frameworks,
       technologies,
@@ -59,7 +111,7 @@ export const useResumeStore = () => {
       databases,
       practices,
       tools,
-      activities,
+      visibleActivities,
     ]
   );
 };

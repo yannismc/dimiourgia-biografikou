@@ -4,6 +4,7 @@ import AddExperience from './components/AddExperience';
 import Experience from './components/Experience';
 
 import MoveEditSection from '@/helpers/common/components/MoveEditSectionContainer';
+import { SectionVisibilityControl } from '@/modules/builder/editor/components/SectionVisibilityControl';
 
 const ExperienceLayout = () => {
   const allWorks = useExperiences((state) => state.experiences);
@@ -19,6 +20,7 @@ const ExperienceLayout = () => {
 
   return (
     <div className="flex flex-col gap-8 mb-8">
+      <SectionVisibilityControl sectionId="work" label="Experience" />
       {allWorks.map((work, index) => (
         <MoveEditSection
           key={work.id}

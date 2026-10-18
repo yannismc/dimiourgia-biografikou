@@ -4,6 +4,7 @@ import AddVolunteeringExp from './components/AddVolunteering';
 import Volunteering from './components/Volunteer';
 
 import MoveEditSection from '@/helpers/common/components/MoveEditSectionContainer';
+import { SectionVisibilityControl } from '@/modules/builder/editor/components/SectionVisibilityControl';
 
 const VolunteeringLayout = () => {
   const allVolunteeringExps = useVoluteeringStore((state) => state.volunteeredExps);
@@ -19,6 +20,7 @@ const VolunteeringLayout = () => {
 
   return (
     <div className="flex flex-col gap-8 mb-8">
+      <SectionVisibilityControl sectionId="volunteer" label="Volunteering" />
       {allVolunteeringExps.map((volunteeringInfo, index) => (
         <MoveEditSection
           key={volunteeringInfo.id}
