@@ -111,6 +111,51 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
     loadComponent: () => import('@/templates/designs/professional/ProfessionalTemplate'),
   },
 
+  'professional-en': {
+    id: 'professional-en',
+    style: {
+      padding: [40, 25, 40, 25],
+      section: 16,
+      entry: 12,
+      column: 14,
+      body: 11,
+      heading: 12,
+      name: 20,
+      lineHeight: 1.5,
+      secondaryColumnPercent: 33.333333333333336,
+    },
+    name: 'Professional Resume',
+    thumbnail: '/templates/professional.webp',
+    sectionLayout: {
+      regionKeys: [REGION_IDS.left, REGION_IDS.right],
+      defaults: {
+        [REGION_IDS.left]: [SECTION_IDS.work, SECTION_IDS.involvement, SECTION_IDS.achievements],
+        [REGION_IDS.right]: [
+          SECTION_IDS.summary,
+          SECTION_IDS.objective,
+          SECTION_IDS.techExpertise,
+          SECTION_IDS.skillsExposure,
+          SECTION_IDS.methodology,
+          SECTION_IDS.tools,
+          SECTION_IDS.education,
+        ],
+      },
+    },
+    sectionRules: [
+      { sectionId: SECTION_IDS.work, when: has.work },
+      { sectionId: SECTION_IDS.involvement, when: has.involvement },
+      { sectionId: SECTION_IDS.achievements, when: has.achievements },
+      { sectionId: SECTION_IDS.summary, when: has.basicsSummary },
+      { sectionId: SECTION_IDS.objective, when: has.basicsObjective },
+      { sectionId: SECTION_IDS.techExpertise, when: has.techExpertise },
+      { sectionId: SECTION_IDS.skillsExposure, when: has.skillsExposure },
+      { sectionId: SECTION_IDS.methodology, when: has.practices },
+      { sectionId: SECTION_IDS.tools, when: has.tools },
+      { sectionId: SECTION_IDS.education, when: has.education },
+    ],
+    loadComponent: () => import('@/templates/designs/professional/ProfessionalEnglishTemplate'),
+  },
+
   'two-page': {
     id: 'two-page',
     style: {
