@@ -207,6 +207,45 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
     loadComponent: () => import('@/templates/designs/two-page/TwoPageTemplate'),
   },
 
+  'academic-cv': {
+    id: 'academic-cv',
+    style: {
+      pages: 2,
+      padding: [16, 18, 14, 18],
+      section: 10,
+      entry: 7,
+      column: 0,
+      body: 14.55,
+      heading: 16,
+      name: 33,
+      lineHeight: 1.2,
+    },
+    name: 'Academic CV',
+    thumbnail: '/templates/classic.webp',
+    sectionLayout: {
+      regionKeys: [REGION_IDS.page1, REGION_IDS.page2],
+      defaults: {
+        [REGION_IDS.page1]: [SECTION_IDS.summary, SECTION_IDS.education, SECTION_IDS.work],
+        [REGION_IDS.page2]: [
+          SECTION_IDS.awards,
+          SECTION_IDS.publications,
+          SECTION_IDS.skills,
+          SECTION_IDS.languages,
+        ],
+      },
+    },
+    sectionRules: [
+      { sectionId: SECTION_IDS.summary, when: has.basicsSummary },
+      { sectionId: SECTION_IDS.education, when: has.education },
+      { sectionId: SECTION_IDS.work, when: has.work },
+      { sectionId: SECTION_IDS.awards, when: has.awards },
+      { sectionId: SECTION_IDS.publications, when: has.publications },
+      { sectionId: SECTION_IDS.skills, when: has.technicalSkills },
+      { sectionId: SECTION_IDS.languages, when: has.academicSpokenLanguages },
+    ],
+    loadComponent: () => import('@/templates/designs/academic-cv/AcademicCvTemplate'),
+  },
+
   spotlight: {
     id: 'spotlight',
     style: {

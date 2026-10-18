@@ -25,8 +25,7 @@ export const isResearchExperience = (item: any) => {
 };
 export const employmentExperience = (r: any) =>
   hasLen((r.work ?? []).filter((item: any) => !isResearchExperience(item)));
-export const researchExperience = (r: any) =>
-  hasLen((r.work ?? []).filter(isResearchExperience));
+export const researchExperience = (r: any) => hasLen((r.work ?? []).filter(isResearchExperience));
 export const awards = (r: any) => hasLen(r.awards);
 export const education = (r: any) => hasLen(r.education);
 export const volunteer = (r: any) => hasLen(r.volunteer);
@@ -34,9 +33,27 @@ export const involvement = (r: any) => hasLen(r.activities?.involvements);
 export const achievements = (r: any) => hasLen(r.activities?.achievements);
 export const publications = (r: any) => hasLen(r.activities?.publications);
 export const languages = (r: any) => hasLen(r.skills?.languages);
+const PROGRAMMING_LANGUAGE =
+  /^(python|matlab|r|c|c\+\+|c#|java|javascript|typescript|julia|go|rust|php|ruby|bash|shell|sql|fortran|scala|kotlin|swift|objective-c|html|css|stata|sas|perl|haskell|lua|octave|wolfram(?: language)?|mathematica)$/i;
+export const isProgrammingLanguage = (name: string) => PROGRAMMING_LANGUAGE.test(name.trim());
+export const academicSpokenLanguages = (r: any) =>
+  hasLen((r.skills?.languages ?? []).filter((item: any) => !isProgrammingLanguage(item.name)));
 export const technologies = (r: any) => hasLen(r.skills?.technologies);
 export const tools = (r: any) => hasLen(r.skills?.tools);
 export const practices = (r: any) => hasLen(r.skills?.practices);
+export const technicalSkills = (r: any) =>
+  hasLen(
+    (r.skills?.languages ?? [])
+      .filter((item: any) => isProgrammingLanguage(item.name))
+      .concat(
+        r.skills?.frameworks ?? [],
+        r.skills?.technologies ?? [],
+        r.skills?.libraries ?? [],
+        r.skills?.databases ?? [],
+        r.skills?.practices ?? [],
+        r.skills?.tools ?? []
+      )
+  );
 
 export const skillsLangFrameworks = (r: any) =>
   hasLen(r.skills?.languages?.concat(r.skills?.frameworks));
