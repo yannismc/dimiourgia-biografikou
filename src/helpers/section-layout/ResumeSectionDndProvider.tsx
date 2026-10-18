@@ -77,9 +77,9 @@ export function ResumeSectionDndProvider({
       const overData = over.data.current as
         { resumeRegion?: string; regionId?: string } | undefined;
       const overSortableRegionId = overData?.resumeRegion ?? overData?.regionId;
-      const base = projectedRef.current ?? regionsRef.current;
+      // Recomputing from a prior projection can flip the item around the same target.
       const next = computeRegionsAfterDrag(
-        base,
+        regionsRef.current,
         regionKeys,
         String(active.id),
         String(over.id),
@@ -115,11 +115,10 @@ export function ResumeSectionDndProvider({
       projectedRef.current = null;
       onDragOverRegions?.(null);
       if (!dragEnabled || !over) return;
-      const latest = projected ?? regionsRef.current;
       const overData = over.data.current;
       const overSortableRegionId = overData?.resumeRegion ?? overData?.regionId;
       const next = computeRegionsAfterDrag(
-        latest,
+        regionsRef.current,
         regionKeys,
         String(active.id),
         String(over.id),
