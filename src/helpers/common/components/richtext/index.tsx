@@ -3,6 +3,7 @@ import 'jodit/es2015/jodit.min.css';
 
 import type { Jodit as JoditInstance } from 'jodit';
 import { LinkPlugin } from './plugins/link';
+import { sanitizeRichText } from './sanitize';
 
 import styles from './jodit.module.css';
 
@@ -36,12 +37,19 @@ export const RichtextEditor = memo(({ label, onChange, value }: IRichtext) => {
           useSearch: false,
           askBeforePasteHTML: false,
           askBeforePasteFromWord: false,
-          defaultActionOnPaste: 'insert_only_text',
+          defaultActionOnPaste: 'insert_as_html',
+          defaultActionOnPasteFromWord: 'insert_as_html',
+          events: {
+            beforePasteInsert: (html: unknown) =>
+              typeof html === 'string' ? sanitizeRichText(html) : undefined,
+            beforeSetValueToEditor: (html: unknown) =>
+              typeof html === 'string' ? sanitizeRichText(html) : undefined,
+          },
           maxHeight: 200,
           link: LinkPlugin,
         });
         instance = editor;
-        editor.value = value;
+        editor.value = sanitizeRichText(value);
         editorRef.current = editor;
         setEditorInstanceCreated(true);
       };
@@ -56,20 +64,27 @@ export const RichtextEditor = memo(({ label, onChange, value }: IRichtext) => {
   }, []);
 
   useEffect(() => {
-    if (editorRef.current && editorInstanceCreated && editorRef.current.value !== value) {
-      editorRef.current.value = value;
+    if (
+      editorRef.current &&
+      editorInstanceCreated &&
+      editorRef.current.value !== sanitizeRichText(value)
+    ) {
+      editorRef.current.value = sanitizeRichText(value);
     }
   }, [value, editorInstanceCreated]);
 
   useEffect(() => {
     if (editorRef.current && editorInstanceCreated) {
       const editor = editorRef.current;
-      editor.events.on('change', onChange);
+      const handleChange = (html: string) => onChange(sanitizeRichText(html));
+      const cleaned = sanitizeRichText(value);
+      if (cleaned !== value) onChange(cleaned);
+      editor.events.on('change', handleChange);
       return () => {
-        if (!editor.isDestructed) editor.events.off('change', onChange);
+        if (!editor.isDestructed) editor.events.off('change', handleChange);
       };
     }
-  }, [onChange, editorInstanceCreated]);
+  }, [onChange, editorInstanceCreated, value]);
 
   return (
     <div className={`${styles.editor_wrapper} mb-4`}>

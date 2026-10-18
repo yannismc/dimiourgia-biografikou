@@ -5,6 +5,7 @@ import { BsEnvelope, BsGeoAlt, BsGlobe, BsTelephone } from 'react-icons/bs';
 import type { SectionProps } from '../types';
 import { socialIcons } from '@/helpers/icons';
 import type { IProfile } from '@/stores/index.interface';
+import { useSurfacePalette } from '@/templates/components/theme';
 
 export const ContactLine = ({
   icon,
@@ -17,6 +18,7 @@ export const ContactLine = ({
   href?: string;
   density?: SectionProps['density'];
 }) => {
+  const palette = useSurfacePalette();
   if (!text) return null;
   const body = (
     <span
@@ -37,7 +39,12 @@ export const ContactLine = ({
   );
   if (href) {
     return (
-      <a href={href} target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        style={{ color: /^(mailto:|tel:)/i.test(href) ? 'inherit' : palette.accent }}
+      >
         {body}
       </a>
     );
@@ -96,6 +103,7 @@ export const ContactBlock = ({
 };
 
 export const SocialIconsRow = ({ profiles, color }: { profiles?: IProfile[]; color?: string }) => {
+  const palette = useSurfacePalette();
   if (!profiles?.length) return null;
   return (
     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -109,7 +117,7 @@ export const SocialIconsRow = ({ profiles, color }: { profiles?: IProfile[]; col
             href={p.url}
             target="_blank"
             rel="noreferrer"
-            style={{ color: color || 'inherit', display: 'inline-flex' }}
+            style={{ color: color || palette.accent, display: 'inline-flex' }}
           >
             {Icon ? (
               <Icon size={13} aria-hidden />
