@@ -420,7 +420,12 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
       regionKeys: [REGION_IDS.main, REGION_IDS.sidebar],
       defaults: {
         [REGION_IDS.main]: [SECTION_IDS.work, SECTION_IDS.education],
-        [REGION_IDS.sidebar]: [SECTION_IDS.summary, SECTION_IDS.skills],
+        [REGION_IDS.sidebar]: [
+          SECTION_IDS.summary,
+          SECTION_IDS.skills,
+          SECTION_IDS.technologies,
+          SECTION_IDS.tools,
+        ],
       },
     },
     sectionRules: [
@@ -428,6 +433,8 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
       { sectionId: SECTION_IDS.education, when: has.education },
       { sectionId: SECTION_IDS.summary, when: has.basicsSummary },
       { sectionId: SECTION_IDS.skills, when: has.skillsLangFrameworks },
+      { sectionId: SECTION_IDS.technologies, when: has.technologies },
+      { sectionId: SECTION_IDS.tools, when: has.tools },
     ],
     loadComponent: () => import('@/templates/designs/inspired/InspiredTemplate'),
   },

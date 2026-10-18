@@ -10,7 +10,7 @@ import { TemplateRegion } from '@/templates/designs/integration/TemplateRegion';
 import { CompactEducation } from '@/templates/components/education';
 import { StandardExperience } from '@/templates/components/experience';
 import { CardProfile } from '@/templates/components/profile';
-import { BarSkills } from '@/templates/components/skills';
+import { BarSkills, ChipSkills } from '@/templates/components/skills';
 import { TextSection } from '@/templates/components/text';
 
 export default function InspiredTemplate() {
@@ -34,6 +34,10 @@ export default function InspiredTemplate() {
             title="Key Skills"
           />
         );
+      case 'technologies':
+        return <ChipSkills items={data.skills.technologies} title="Technologies" />;
+      case 'tools':
+        return <ChipSkills items={data.skills.tools} title="Tools" />;
       default:
         return null;
     }
