@@ -211,7 +211,7 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
     id: 'academic-cv',
     style: {
       pages: 2,
-      padding: [16, 18, 14, 18],
+      padding: [15, 16, 14, 16],
       section: 10,
       entry: 7,
       column: 0,

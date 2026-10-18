@@ -88,9 +88,10 @@ function AcademicPage({
             color: BODY,
             fontFamily: FONT,
             fontSize: bodySize(11),
-            lineHeight: 1.16,
-            padding: padding('16mm 18mm 14mm'),
-            '--resume-padding': '16mm 18mm 14mm',
+            lineHeight: 1.23,
+            padding: padding('15mm 16mm 14mm'),
+            '--resume-padding': '15mm 16mm 14mm',
+            '--resume-line-height': '1.23',
             '--resume-name': '33px',
             '--resume-heading': '16px',
             '--resume-body': '14.55px',
@@ -114,9 +115,17 @@ function AcademicPage({
   );
 }
 
-function AcademicSection({ title, children }: { title: string; children: ReactNode }) {
+function AcademicSection({
+  title,
+  children,
+  className = '',
+}: {
+  title: string;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <section className="academic-cv-section">
+    <section className={`academic-cv-section ${className}`}>
       <h2>{title}</h2>
       {children}
     </section>
@@ -131,16 +140,20 @@ function EntryHeader({
   title,
   date,
   subtitle,
+  subtitleBold = false,
 }: {
   title: string;
   date?: string;
   subtitle?: string;
+  subtitleBold?: boolean;
 }) {
   return (
     <div className="academic-cv-entry-header">
       <div className="academic-cv-entry-title">
         <strong>{title}</strong>
-        {subtitle && <span>{` — ${subtitle}`}</span>}
+        {subtitle && (
+          <span style={subtitleBold ? { fontWeight: 700 } : undefined}>{` – ${subtitle}`}</span>
+        )}
       </div>
       {date && <DateText>{date}</DateText>}
     </div>
@@ -191,15 +204,14 @@ export default function AcademicCvTemplate() {
   const skills = data.skills ?? {};
   const languages: SkillItem[] = skills.languages ?? [];
   const publicationHtml = data.activities?.publications ?? '';
-  const firstAffiliation = education[0]?.institution || work[0]?.name || '';
-  const contactLine = [
-    firstAffiliation,
-    compactUrl(basics.url),
-    basics.phone ? `tel: ${basics.phone}` : '',
-    basics.email,
-  ]
-    .filter(Boolean)
-    .join(' | ');
+  const firstAffiliation =
+    education[0]?.institution.replace(/\s*\([^)]*\)\s*$/, '') || work[0]?.name || '';
+  const website = compactUrl(basics.url);
+  const websiteHref = basics.url
+    ? /^https?:\/\//i.test(basics.url)
+      ? basics.url
+      : `https://${basics.url}`
+    : '';
 
   const renderSection = (id: string) => {
     switch (id) {
@@ -216,7 +228,8 @@ export default function AcademicCvTemplate() {
               <div className="academic-cv-entry" key={item.id || index}>
                 <EntryHeader
                   title={item.institution}
-                  subtitle={item.studyType || item.area}
+                  subtitle={item.isStudyingHere ? item.studyType : undefined}
+                  subtitleBold={item.isStudyingHere}
                   date={formatDateRange(
                     item.startDate,
                     item.endDate,
@@ -225,14 +238,31 @@ export default function AcademicCvTemplate() {
                     true
                   )}
                 />
-                {item.studyType && item.area && item.area !== item.studyType && (
-                  <div className="academic-cv-detail">{item.area}</div>
+                {!item.isStudyingHere && item.studyType && (
+                  <div className="academic-cv-degree">{item.studyType}</div>
                 )}
-                {item.score && <div className="academic-cv-detail">{item.score}</div>}
+                {item.area && (
+                  <div className="academic-cv-detail academic-cv-education-area">
+                    <AcademicRichText html={item.area} />
+                  </div>
+                )}
+                {item.score && (
+                  <div className="academic-cv-detail">
+                    <AcademicRichText html={item.score} />
+                  </div>
+                )}
                 {item.courses?.length > 0 && (
                   <ul className="academic-cv-bullets">
                     {item.courses.map((course, courseIndex) => (
-                      <li key={`${item.id || index}-course-${courseIndex}`}>{course}</li>
+                      <li key={`${item.id || index}-course-${courseIndex}`}>
+                        {course.startsWith('Thesis: ') ? (
+                          <>
+                            <strong>Thesis:</strong> {course.slice('Thesis: '.length)}
+                          </>
+                        ) : (
+                          course
+                        )}
+                      </li>
                     ))}
                   </ul>
                 )}
@@ -247,7 +277,6 @@ export default function AcademicCvTemplate() {
               <div className="academic-cv-entry" key={item.id || index}>
                 <EntryHeader
                   title={item.position}
-                  subtitle={item.name}
                   date={formatDateRange(
                     item.startDate,
                     item.endDate,
@@ -256,6 +285,7 @@ export default function AcademicCvTemplate() {
                     true
                   )}
                 />
+                {item.name && <div className="academic-cv-work-org">{item.name}</div>}
                 <AcademicRichText html={item.summary} />
               </div>
             ))}
@@ -278,7 +308,7 @@ export default function AcademicCvTemplate() {
         ) : null;
       case 'publications':
         return publicationHtml.trim() ? (
-          <AcademicSection title="Publications">
+          <AcademicSection title="Publications" className="academic-cv-publications">
             <AcademicRichText html={publicationHtml} />
           </AcademicSection>
         ) : null;
@@ -309,7 +339,7 @@ export default function AcademicCvTemplate() {
             <div className="academic-cv-language-line">
               {languages
                 .filter((language) => !isProgrammingLanguage(language.name))
-                .map((language) => {
+                .map((language, index) => {
                   const level = language.level;
                   const descriptor =
                     level > 5
@@ -327,9 +357,13 @@ export default function AcademicCvTemplate() {
                           : level >= 3
                             ? 'intermediate'
                             : 'basic';
-                  return `${escapeHtml(language.name)} (${descriptor})`;
-                })
-                .join(' · ')}
+                  return (
+                    <span key={`${language.name}-${index}`}>
+                      {index > 0 && ' · '}
+                      <strong>{escapeHtml(language.name)}</strong> ({descriptor})
+                    </span>
+                  );
+                })}
             </div>
           </AcademicSection>
         ) : null;
@@ -344,8 +378,32 @@ export default function AcademicCvTemplate() {
         <AcademicPage name={basics.name} pageNumber={1}>
           <header className="academic-cv-header">
             <h1>{basics.name}</h1>
-            {basics.label && <div className="academic-cv-tagline">{basics.label}</div>}
-            {contactLine && <div className="academic-cv-contact">{contactLine}</div>}
+            {basics.label && (
+              <div className="academic-cv-tagline">{basics.label.replace(/\s*·\s*/g, ' · ')}</div>
+            )}
+            {(firstAffiliation || website || basics.phone || basics.email) && (
+              <div className="academic-cv-contact">
+                {firstAffiliation && <span>{firstAffiliation}</span>}
+                {website && (
+                  <>
+                    <span className="academic-cv-contact-separator">|</span>
+                    <a href={websiteHref}>{website}</a>
+                  </>
+                )}
+                {basics.phone && (
+                  <>
+                    <span className="academic-cv-contact-separator">|</span>
+                    <span>{`tel: ${basics.phone}`}</span>
+                  </>
+                )}
+                {basics.email && (
+                  <>
+                    <span className="academic-cv-contact-separator">|</span>
+                    <a href={`mailto:${basics.email}`}>{basics.email}</a>
+                  </>
+                )}
+              </div>
+            )}
           </header>
           <TemplateRegion
             regionId="page1"
