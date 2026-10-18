@@ -1,17 +1,22 @@
-/* oxlint-disable typescript/no-explicit-any */
-import { ChangeEvent, Fragment, useEffect } from 'react';
+import { Fragment, useEffect } from 'react';
+import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
+import { socialIcons } from '@/helpers/icons';
 
-const SUPPORTED_NETWORKS = {
-  linkedin: 'linkedin',
-  twitter: 'twitter',
-  github: 'github',
-  hackerrank: 'hackerrank',
-  hackerearth: 'hackerearth',
-  codechef: 'codechef',
-  leetcode: 'leetcode',
-  cssbattle: 'cssbattle',
-};
+const SUPPORTED_NETWORKS = [
+  { network: 'linkedin', label: 'LinkedIn' },
+  { network: 'twitter', label: 'Twitter' },
+  { network: 'github', label: 'Github' },
+  { network: 'hackerrank', label: 'Hackerrank' },
+  { network: 'hackerearth', label: 'HackerEarth' },
+  { network: 'codechef', label: 'CodeChef' },
+  { network: 'leetcode', label: 'Leetcode' },
+  { network: 'cssbattle', label: 'CSSBattle' },
+  { network: 'xing', label: 'Xing' },
+  { network: 'researchgate', label: 'ResearchGate' },
+  { network: 'googlescholar', label: 'Google Scholar' },
+  { network: 'orcid', label: 'ORCID' },
+] as const;
 
 interface IProfileNetwork {
   network: string;
@@ -19,148 +24,65 @@ interface IProfileNetwork {
   url: string;
 }
 
-interface ISupportedNtwkDefaultState {
-  [key: string]: IProfileNetwork;
-}
-
-const SUPPORTED_NETWORK_DEFAULT_STATE: ISupportedNtwkDefaultState = {
-  linkedin: {
-    network: 'linkedin',
-    username: 'janedoe',
-    url: '',
-  },
-  twitter: {
-    network: 'twitter',
-    username: 'janedoe',
-    url: '',
-  },
-  github: {
-    network: 'github',
-    username: 'janedoe',
-    url: '',
-  },
-  hackerrank: {
-    network: 'hackerrank',
-    username: 'janedoe',
-    url: '',
-  },
-  hackerearth: {
-    network: 'hackerearth',
-    username: 'janedoe',
-    url: '',
-  },
-  codechef: {
-    network: 'codechef',
-    username: 'janedoe',
-    url: '',
-  },
-  leetcode: {
-    network: 'leetcode',
-    username: 'janedoe',
-    url: '',
-  },
-  cssbattle: {
-    network: 'cssbattle',
-    username: 'janedoe',
-    url: '',
-  },
-};
+const normalizeNetwork = (network: string) => network.toLowerCase().replace(/[\s_-]/g, '');
 
 const Links = ({
   basicTabs,
   onChangeHandler,
 }: {
-  basicTabs: any;
-  onChangeHandler: (value: any, key: string) => void;
+  basicTabs: { profiles?: IProfileNetwork[] };
+  onChangeHandler: (value: IProfileNetwork[], key: string) => void;
 }) => {
-  const networks = { ...SUPPORTED_NETWORK_DEFAULT_STATE };
-  Object.keys(SUPPORTED_NETWORKS).forEach((ntwk) => {
-    const matchedNetwork = basicTabs.profiles.find(
-      (profile: IProfileNetwork) => profile.network === ntwk
-    );
-    if (matchedNetwork) {
-      networks[ntwk] = matchedNetwork;
-    }
-  });
+  const profiles = basicTabs.profiles ?? [];
+  const networks = SUPPORTED_NETWORKS.map(
+    ({ network }) =>
+      profiles.find((profile) => normalizeNetwork(profile.network) === network) ?? {
+        network,
+        username: '',
+        url: '',
+      }
+  );
+  const unsupportedProfiles = profiles.filter(
+    (profile) =>
+      !SUPPORTED_NETWORKS.some(({ network }) => normalizeNetwork(profile.network) === network)
+  );
 
   useEffect(() => {
-    onChangeHandler(Object.values(networks), 'profiles');
+    onChangeHandler([...networks, ...unsupportedProfiles], 'profiles');
     // oxlint-disable-next-line react/exhaustive-deps
   }, []);
 
   const onURLChange = (value: string, network: string) => {
-    const profiles = basicTabs.profiles;
-    const matchedNetwork = profiles.find((profile: IProfileNetwork) => profile.network === network);
-    matchedNetwork.url = value;
-    onChangeHandler(profiles, 'profiles');
+    const updatedProfiles = networks.map((profile) =>
+      normalizeNetwork(profile.network) === network ? { ...profile, network, url: value } : profile
+    );
+    onChangeHandler([...updatedProfiles, ...unsupportedProfiles], 'profiles');
   };
 
   return (
     <Fragment>
-      <TextField
-        label="LinkedIn"
-        variant="filled"
-        value={networks[SUPPORTED_NETWORKS.linkedin].url}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          onURLChange(event.target.value, SUPPORTED_NETWORKS.linkedin);
-        }}
-      />
-      <TextField
-        label="Twitter"
-        variant="filled"
-        value={networks[SUPPORTED_NETWORKS.twitter].url}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          onURLChange(event.target.value, SUPPORTED_NETWORKS.twitter);
-        }}
-      />
-      <TextField
-        label="Github"
-        variant="filled"
-        value={networks[SUPPORTED_NETWORKS.github].url}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          onURLChange(event.target.value, SUPPORTED_NETWORKS.github);
-        }}
-      />
-      <TextField
-        label="Hackerrank"
-        variant="filled"
-        value={networks[SUPPORTED_NETWORKS.hackerrank].url}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          onURLChange(event.target.value, SUPPORTED_NETWORKS.hackerrank);
-        }}
-      />
-      <TextField
-        label="HackerEarth"
-        variant="filled"
-        value={networks[SUPPORTED_NETWORKS.hackerearth].url}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          onURLChange(event.target.value, SUPPORTED_NETWORKS.hackerearth);
-        }}
-      />
-      <TextField
-        label="CodeChef"
-        variant="filled"
-        value={networks[SUPPORTED_NETWORKS.codechef].url}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          onURLChange(event.target.value, SUPPORTED_NETWORKS.codechef);
-        }}
-      />
-      <TextField
-        label="Leetcode"
-        variant="filled"
-        value={networks[SUPPORTED_NETWORKS.leetcode].url}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          onURLChange(event.target.value, SUPPORTED_NETWORKS.leetcode);
-        }}
-      />
-      <TextField
-        label="CSSBattle"
-        variant="filled"
-        value={networks[SUPPORTED_NETWORKS.cssbattle].url}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          onURLChange(event.target.value, SUPPORTED_NETWORKS.cssbattle);
-        }}
-      />
+      {SUPPORTED_NETWORKS.map(({ network, label }) => {
+        const Icon = socialIcons.get(network);
+        const profile = networks.find((item) => normalizeNetwork(item.network) === network);
+        return (
+          <TextField
+            key={network}
+            label={label}
+            variant="filled"
+            value={profile?.url ?? ''}
+            slotProps={{
+              input: {
+                startAdornment: Icon ? (
+                  <InputAdornment position="start">
+                    <Icon size={18} aria-hidden />
+                  </InputAdornment>
+                ) : undefined,
+              },
+            }}
+            onChange={(event) => onURLChange(event.target.value, network)}
+          />
+        );
+      })}
     </Fragment>
   );
 };

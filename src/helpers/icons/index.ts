@@ -5,6 +5,10 @@ import { FaHackerrank } from 'react-icons/fa';
 import { SiCodechef } from 'react-icons/si';
 import { SiHackerearth } from 'react-icons/si';
 import { SiLeetcode } from 'react-icons/si';
+import { SiGooglescholar } from 'react-icons/si';
+import { SiOrcid } from 'react-icons/si';
+import { SiResearchgate } from 'react-icons/si';
+import { SiXing } from 'react-icons/si';
 import { TbSwords } from 'react-icons/tb';
 import { BsGlobe } from 'react-icons/bs';
 
@@ -17,5 +21,11 @@ export const socialIcons = new Map([
   ['hackerearth', SiHackerearth],
   ['codechef', SiCodechef],
   ['leetcode', SiLeetcode],
+  ['xing', SiXing],
+  ['researchgate', SiResearchgate],
+  ['googlescholar', SiGooglescholar],
+  ['google-scholar', SiGooglescholar],
+  ['google scholar', SiGooglescholar],
+  ['orcid', SiOrcid],
   ['cssbattle', TbSwords],
 ]);

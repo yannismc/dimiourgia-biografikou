@@ -100,7 +100,7 @@ export const SocialIconsRow = ({ profiles, color }: { profiles?: IProfile[]; col
   return (
     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
       {profiles.map((p) => {
-        const Icon = socialIcons.get(p.network);
+        const Icon = socialIcons.get(p.network.toLowerCase());
         if (!p.url) return null;
         return (
           <a

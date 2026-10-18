@@ -24,7 +24,17 @@ export function SpotlightProfile({ basics }: { basics: ProfileBasics }) {
     { text: basics.url, href: basics.url, icon: <BsGlobe /> },
     ...(basics.profiles ?? [])
       .filter((profile) =>
-        ['linkedin', 'twitter', 'github'].includes(profile.network.toLowerCase())
+        [
+          'linkedin',
+          'twitter',
+          'github',
+          'xing',
+          'researchgate',
+          'googlescholar',
+          'google-scholar',
+          'google scholar',
+          'orcid',
+        ].includes(profile.network.toLowerCase())
       )
       .map((profile) => {
         const Icon = socialIcons.get(profile.network.toLowerCase());
