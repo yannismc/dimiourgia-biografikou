@@ -13,7 +13,11 @@ export const normalizeInstitution = (value: unknown) =>
     .toLocaleLowerCase('el');
 export const isTeiAthensExperience = (item: any) => {
   const institution = normalizeInstitution(item?.name);
-  return institution.includes('tei athin') || institution.includes('τει αθην');
+  return (
+    institution.includes('tei athin') ||
+    institution.includes('tei of athens') ||
+    institution.includes('τει αθην')
+  );
 };
 export const isResearchExperience = (item: any) => {
   const institution = normalizeInstitution(item?.name);
@@ -26,6 +30,7 @@ export const isResearchExperience = (item: any) => {
 export const employmentExperience = (r: any) =>
   hasLen((r.work ?? []).filter((item: any) => !isResearchExperience(item)));
 export const researchExperience = (r: any) => hasLen((r.work ?? []).filter(isResearchExperience));
+export const researchInterests = (r: any) => hasLen(r.activities?.researchInterests);
 export const awards = (r: any) => hasLen(r.awards);
 export const education = (r: any) => hasLen(r.education);
 export const volunteer = (r: any) => hasLen(r.volunteer);

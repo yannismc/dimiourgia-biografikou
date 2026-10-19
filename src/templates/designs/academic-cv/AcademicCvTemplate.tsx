@@ -204,6 +204,7 @@ export default function AcademicCvTemplate() {
   const skills = data.skills ?? {};
   const languages: SkillItem[] = skills.languages ?? [];
   const publicationHtml = data.activities?.publications ?? '';
+  const researchInterests: string[] = data.activities?.researchInterests ?? [];
   const firstAffiliation =
     education[0]?.institution.replace(/\s*\([^)]*\)\s*$/, '') || work[0]?.name || '';
   const website = compactUrl(basics.url);
@@ -217,10 +218,33 @@ export default function AcademicCvTemplate() {
     switch (id) {
       case 'summary':
         return (
-          <AcademicSection title="Research Interests">
+          <AcademicSection title="About Me">
             <AcademicRichText html={basics.summary} />
           </AcademicSection>
         );
+      case 'research_experience': {
+        const researchWork = work.filter(isResearchExperience);
+        return researchWork.length ? (
+          <AcademicSection title="Research Experience">
+            {researchWork.map((item, index) => (
+              <div className="academic-cv-entry" key={item.id || index}>
+                <EntryHeader
+                  title={item.position}
+                  date={formatDateRange(
+                    item.startDate,
+                    item.endDate,
+                    item.isWorkingHere,
+                    'en',
+                    true
+                  )}
+                />
+                {item.name && <div className="academic-cv-work-org">{item.name}</div>}
+                <AcademicRichText html={item.summary} />
+              </div>
+            ))}
+          </AcademicSection>
+        ) : null;
+      }
       case 'education':
         return education.length ? (
           <AcademicSection title="Education">
@@ -270,10 +294,11 @@ export default function AcademicCvTemplate() {
             ))}
           </AcademicSection>
         ) : null;
-      case 'work':
-        return work.length ? (
-          <AcademicSection title="Research Experience">
-            {work.map((item, index) => (
+      case 'work': {
+        const professionalWork = work.filter((item) => !isResearchExperience(item));
+        return professionalWork.length ? (
+          <AcademicSection title="Professional Experience">
+            {professionalWork.map((item, index) => (
               <div className="academic-cv-entry" key={item.id || index}>
                 <EntryHeader
                   title={item.position}
@@ -289,6 +314,17 @@ export default function AcademicCvTemplate() {
                 <AcademicRichText html={item.summary} />
               </div>
             ))}
+          </AcademicSection>
+        ) : null;
+      }
+      case 'research_interests':
+        return researchInterests.length ? (
+          <AcademicSection title="Research Interests">
+            <ul className="academic-cv-bullets">
+              {researchInterests.map((interest, index) => (
+                <li key={`${interest}-${index}`}>{interest}</li>
+              ))}
+            </ul>
           </AcademicSection>
         ) : null;
       case 'awards':

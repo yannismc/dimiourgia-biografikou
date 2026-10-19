@@ -2,6 +2,7 @@ export interface IActivity {
   involvements: string;
   achievements: string;
   publications: string;
+  researchInterests: string[];
 }
 
 export interface IActivityStore {
@@ -11,4 +12,5 @@ export interface IActivityStore {
   updateInvolvements: (involvements: string) => void;
   updateAchievements: (achievements: string) => void;
   updatePublications: (publications: string) => void;
+  updateResearchInterests: (researchInterests: string[]) => void;
 }

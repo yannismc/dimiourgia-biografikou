@@ -10,6 +10,8 @@ import {
 
 import ResumeData from '@/helpers/constants/resumes/Anonym.el.json';
 import { useSectionLayoutStore } from '@/stores/useSectionLayoutStore';
+import { useTemplates } from '@/stores/useTemplate';
+import { isResearchExperience } from '@/templates/designs/registry/predicates';
 import { useActivity } from './activity';
 import { useAwards } from './awards';
 import { useBasicDetails } from './basic';
@@ -35,6 +37,7 @@ export const useResumeStore = () => {
   const tools = useTools((state) => state.get());
   const activities = useActivity((state) => state.get());
   const sectionVisibility = useSectionLayoutStore((state) => state.sectionVisibility);
+  const activeTemplateId = useTemplates((state) => state.activeTemplate.id);
 
   const basics = useMemo(
     () => ({
@@ -61,10 +64,16 @@ export const useResumeStore = () => {
     }),
     [storedBasics, sectionVisibility]
   );
-  const visibleWork = useMemo(
-    () => (sectionVisibility.work === false ? [] : work),
-    [sectionVisibility.work, work]
-  );
+  const visibleWork = useMemo(() => {
+    const hasSeparateResearchSection = ['academic-cv', 'two-page'].includes(activeTemplateId);
+    if (!hasSeparateResearchSection) return sectionVisibility.work === false ? [] : work;
+
+    return work.filter((item) =>
+      isResearchExperience(item)
+        ? sectionVisibility.research_experience !== false
+        : sectionVisibility.work !== false
+    );
+  }, [activeTemplateId, sectionVisibility.research_experience, sectionVisibility.work, work]);
   const visibleEducation = useMemo(
     () => (sectionVisibility.education === false ? [] : education),
     [sectionVisibility.education, education]
@@ -83,6 +92,8 @@ export const useResumeStore = () => {
       involvements: sectionVisibility.involvement === false ? '' : activities.involvements,
       achievements: sectionVisibility.achievements === false ? '' : activities.achievements,
       publications: sectionVisibility.publications === false ? '' : activities.publications,
+      researchInterests:
+        sectionVisibility.research_interests === false ? [] : (activities.researchInterests ?? []),
     }),
     [activities, sectionVisibility]
   );

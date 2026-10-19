@@ -227,6 +227,8 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
       defaults: {
         [REGION_IDS.page1]: [SECTION_IDS.summary, SECTION_IDS.education, SECTION_IDS.work],
         [REGION_IDS.page2]: [
+          SECTION_IDS.researchExperience,
+          SECTION_IDS.researchInterests,
           SECTION_IDS.awards,
           SECTION_IDS.publications,
           SECTION_IDS.skills,
@@ -237,7 +239,9 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
     sectionRules: [
       { sectionId: SECTION_IDS.summary, when: has.basicsSummary },
       { sectionId: SECTION_IDS.education, when: has.education },
-      { sectionId: SECTION_IDS.work, when: has.work },
+      { sectionId: SECTION_IDS.work, when: has.employmentExperience },
+      { sectionId: SECTION_IDS.researchExperience, when: has.researchExperience },
+      { sectionId: SECTION_IDS.researchInterests, when: has.researchInterests },
       { sectionId: SECTION_IDS.awards, when: has.awards },
       { sectionId: SECTION_IDS.publications, when: has.publications },
       { sectionId: SECTION_IDS.skills, when: has.technicalSkills },

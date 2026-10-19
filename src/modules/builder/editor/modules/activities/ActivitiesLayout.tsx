@@ -7,6 +7,7 @@ import BasicPanel from './components/BasicPanel';
 import Involvements from './components/Involvements';
 import { ReactNode } from 'react';
 import Publications from './components/Publications';
+import ResearchInterests from './components/ResearchInterests';
 import { SectionVisibilityControl } from '@/modules/builder/editor/components/SectionVisibilityControl';
 import { SECTION_IDS } from '@/templates/designs/registry/sectionIds';
 
@@ -39,6 +40,12 @@ const allActivityTabs: IAllActivityTabs = {
     label: 'Publications',
     sectionId: SECTION_IDS.publications,
     component: Publications,
+  },
+  researchInterests: {
+    key: 'researchInterests',
+    label: 'Research Interests',
+    sectionId: SECTION_IDS.researchInterests,
+    component: ResearchInterests,
   },
 };
 

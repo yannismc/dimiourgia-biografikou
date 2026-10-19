@@ -35,6 +35,15 @@ const updatePublications = (set: SetState<IActivityStore>) => (publications: str
   );
 };
 
+const updateResearchInterests =
+  (set: SetState<IActivityStore>) => (researchInterests: string[]) => {
+    set(
+      produce((state: IActivityStore) => {
+        state.activities.researchInterests = researchInterests;
+      })
+    );
+  };
+
 export const useActivity = create<IActivityStore>()(
   persist(
     (set, get) => ({
@@ -45,6 +54,7 @@ export const useActivity = create<IActivityStore>()(
       updateAchievements: updateAchievements(set),
       updateInvolvements: updateInvolvements(set),
       updatePublications: updatePublications(set),
+      updateResearchInterests: updateResearchInterests(set),
     }),
     {
       name: 'activities',
