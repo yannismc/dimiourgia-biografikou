@@ -1,8 +1,10 @@
-import { font, bodySize, spacing } from '@/helpers/resume-style/styles';
+import { bodySize, font, spacing } from '@/helpers/resume-style/styles';
 import { SectionFrame } from '../primitives/SectionFrame';
 import { formatDateRange, type DateLocale } from '../primitives/formatDateRange';
-import { useSurfacePalette, MONO_FONT } from '../theme';
+import { useSurfacePalette } from '../theme';
 import type { EducationItem, ItemsProps } from '../types';
+
+const MONO_FONT = "'SFMono-Regular', Consolas, monospace";
 
 type Props = ItemsProps<EducationItem> & {
   dateLocale?: DateLocale;
@@ -43,9 +45,7 @@ function Education({
                 <span style={{ fontWeight: design === 'standard' ? 400 : 600 }}>
                   {[item.studyType, item.area].filter(Boolean).join(' — ')}
                 </span>
-                {item.institution && (
-                  <span style={{ color: p.muted }}> — {item.institution}</span>
-                )}
+                {item.institution && <span style={{ color: p.muted }}> — {item.institution}</span>}
               </div>
               <span
                 style={{

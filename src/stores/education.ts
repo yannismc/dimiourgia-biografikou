@@ -1,3 +1,4 @@
+import { browserResumeStorage } from './browserResumeStorage';
 import { create } from 'zustand';
 import { GetState, SetState } from './store.interface';
 import { persist } from 'zustand/middleware';
@@ -100,6 +101,6 @@ export const useEducations = create<IEducationStore>()(
       onmovedown: onMoveDown(set),
       updateEducation: updateEducation(set),
     }),
-    { name: 'education' }
+    { skipHydration: true, storage: browserResumeStorage, name: 'education' }
   )
 );

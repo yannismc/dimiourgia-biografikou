@@ -1,0 +1,145 @@
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { ReactNode } from 'react';
+import BuilderLayout from './BuilderLayout';
+import { useCloudResumeStore } from '@/stores/useCloudResumeStore';
+import { applyImportedResumeJson } from './nav-bar/applyImportedResume';
+
+// URL synchronization is covered separately; these tests bypass saved-resume hydration.
+vi.mock('./ActiveResumeUrl', () => ({ ActiveResumeUrl: () => null }));
+
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => new URLSearchParams(window.location.search),
+  usePathname: () => window.location.pathname,
+}));
+vi.mock('./BuilderStateHydration', () => ({
+  BuilderStateHydration: ({ children }: { children: ReactNode }) => children,
+  useBuilderStateReady: () => true,
+}));
+vi.mock('./nav-bar/NavBarLayout', () => ({ default: () => <nav>Builder navigation</nav> }));
+vi.mock('./editor/EditorLayout', () => ({
+  default: ({ onViewResume }: { onViewResume: () => void }) => (
+    <button onClick={onViewResume}>View Resume</button>
+  ),
+}));
+vi.mock('./resume/components/ResumeHeader', () => ({ default: () => <div>Preview controls</div> }));
+vi.mock('./resume/ResumeLayout', () => ({
+  ResumeLayout: ({ readOnly }: { readOnly?: boolean }) => (
+    <div role="region" aria-label="Resume" data-readonly={!!readOnly}>
+      Resume content
+    </div>
+  ),
+}));
+
+vi.mock('./nav-bar/applyImportedResume', () => ({ applyImportedResumeJson: vi.fn() }));
+
+afterEach(() => {
+  useCloudResumeStore.getState().setId(null);
+  window.history.replaceState(null, '', '/');
+  vi.unstubAllGlobals();
+  vi.clearAllMocks();
+});
+
+describe('resume-only view', () => {
+  it('hides editing controls and ignores Escape in view mode', () => {
+    window.history.replaceState(null, '', '/builder?mode=view');
+    render(<BuilderLayout />);
+    expect(screen.getByRole('region', { name: 'Resume' })).toHaveAttribute('data-readonly', 'true');
+    expect(screen.queryByRole('button', { name: 'Edit Resume' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(window.location.search).toBe('?mode=view');
+  });
+
+  it('returns to editing with Escape and preserves URL context', () => {
+    window.history.replaceState(null, '', '/builder/saved-id?other=keep&mode=edit#resume');
+    const { rerender } = render(<BuilderLayout />);
+    fireEvent.keyDown(window, { key: 'Escape' });
+    rerender(<BuilderLayout />);
+    expect(window.location.pathname + window.location.search + window.location.hash).toBe(
+      '/builder/saved-id?other=keep#resume'
+    );
+    expect(screen.getByRole('navigation')).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Edit' })).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it.each(['/builder', '/builder/saved-id'])('toggles %s without losing URL context', (path) => {
+    window.history.replaceState(null, '', `${path}?other=keep#resume`);
+    const { rerender } = render(<BuilderLayout />);
+    fireEvent.click(screen.getByRole('button', { name: 'View Resume' }));
+    expect(window.location.search).toBe('?other=keep&mode=edit');
+    rerender(<BuilderLayout />);
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(screen.queryByText('Preview controls')).not.toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Resume' })).toHaveAttribute('data-readonly', 'true');
+    fireEvent.click(screen.getByRole('button', { name: 'Edit Resume' }));
+    rerender(<BuilderLayout />);
+    expect(screen.getByRole('navigation')).toBeInTheDocument();
+    expect(window.location.pathname + window.location.search + window.location.hash).toBe(
+      `${path}?other=keep#resume`
+    );
+  });
+
+  it.each(['?mode=edit'])('opens directly with %s', (query) => {
+    window.history.replaceState(null, '', `/builder${query}`);
+    render(<BuilderLayout />);
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Edit Resume' })).toBeInTheDocument();
+  });
+});
+
+describe('URL imports across views', () => {
+  it.each([true, false])('completes an import starting with resume-only=%s', async (viewOnly) => {
+    window.history.replaceState(
+      null,
+      '',
+      `/builder?importUrl=https%3A%2F%2Fexample.com%2Fresume.json&other=keep${viewOnly ? '&mode=edit' : ''}#resume`
+    );
+    let finish!: (response: Response) => void;
+    const fetchMock = vi.fn().mockReturnValue(
+      new Promise<Response>((resolve) => {
+        finish = resolve;
+      })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    const { rerender } = render(<BuilderLayout />);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const signal = fetchMock.mock.calls[0][1].signal as AbortSignal;
+    fireEvent.click(screen.getByRole('button', { name: viewOnly ? 'Edit Resume' : 'View Resume' }));
+    rerender(<BuilderLayout />);
+    expect(signal.aborted).toBe(false);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const data = { basics: { name: 'Imported resume' } };
+    await act(async () => finish(Response.json(data)));
+    await waitFor(() => expect(applyImportedResumeJson).toHaveBeenCalledWith(data));
+    expect(applyImportedResumeJson).toHaveBeenCalledTimes(1);
+    expect(window.location.search).toBe(viewOnly ? '?other=keep' : '?other=keep&mode=edit');
+    expect(window.location.hash).toBe('#resume');
+    expect(await screen.findByText('Resume data was successfully imported.')).toBeInTheDocument();
+  });
+});
+
+it.each(['', '?mode=edit', '?mode=view', '?code=bad1'])(
+  'keeps a saved resume view-only without verified access: %s',
+  (query) => {
+    useCloudResumeStore.getState().setId('saved-id');
+    window.history.replaceState(null, '', `/builder/saved-id${query}`);
+    const { rerender } = render(<BuilderLayout />);
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Edit Resume' })).not.toBeInTheDocument();
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(useCloudResumeStore.getState().id).toBe('saved-id');
+    fireEvent.click(screen.getByRole('button', { name: 'Create a copy' }));
+    rerender(<BuilderLayout />);
+    expect(useCloudResumeStore.getState().id).toBeNull();
+    expect(useCloudResumeStore.getState().code).toBeNull();
+    expect(screen.getByRole('navigation')).toBeInTheDocument();
+  }
+);
+
+it('allows editing a saved resume with server-verified access', () => {
+  useCloudResumeStore.getState().setId('saved-id', 'a7B2');
+  window.history.replaceState(null, '', '/builder/saved-id?code=a7B2');
+  render(<BuilderLayout />);
+  expect(screen.getByRole('navigation')).toBeInTheDocument();
+});

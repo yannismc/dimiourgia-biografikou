@@ -83,12 +83,17 @@ export const roleSize = (role: 'heading' | 'name', original: number) =>
 export const lineHeight = (original: number) =>
   `clamp(1.1, calc(var(--resume-line-height, calc(${original} * var(--resume-line-factor, 1))) * var(--resume-fit-scale, 1)), 1.8)`;
 export const spacing = (role: 'section' | 'entry' | 'column', original: number) =>
-  `clamp(0px, calc(var(--resume-${role}, calc(${original}px * var(--resume-density, 1))) * var(--resume-fit-scale, 1)), 40px)`;
+  role === 'entry'
+    ? `clamp(0px, calc(var(--resume-entry, calc(${original}px * var(--resume-entry-factor, var(--resume-density, 1)))) * var(--resume-fit-scale, 1)), 40px)`
+    : `clamp(0px, calc(var(--resume-${role}, calc(${original}px * var(--resume-density, 1))) * var(--resume-fit-scale, 1)), 40px)`;
 export const padding = (original: CSSProperties['padding']) =>
   `var(--resume-padding, ${typeof original === 'number' ? `${original}px` : original})`;
 export const sideString = (sides: Sides, unit: string) =>
   `${sides.top}${unit} ${sides.right}${unit} ${sides.bottom}${unit} ${sides.left}${unit}`;
-export function styleVariables(s: StyleSettings): CSSProperties {
+export function styleVariables(
+  s: StyleSettings,
+  entryBaseline?: { value: number; density: number }
+): CSSProperties {
   const vars: Record<string, string | number> = {};
   if (s.contentPadding) vars['--resume-padding'] = sideString(s.contentPadding, 'px');
   if (s.typography?.family) vars['--resume-font'] = fontFamilies[s.typography.family];
@@ -97,7 +102,14 @@ export function styleVariables(s: StyleSettings): CSSProperties {
   if (s.typography?.lineHeight !== undefined)
     vars['--resume-line-height'] = s.typography.lineHeight;
   for (const key of ['section', 'entry', 'column'] as const)
-    if (s.spacing?.[key] !== undefined) vars[`--resume-${key}`] = `${s.spacing[key]}px`;
+    if (s.spacing?.[key] !== undefined && key !== 'entry')
+      vars[`--resume-${key}`] = `${s.spacing[key]}px`;
+  if (s.spacing?.entry !== undefined && entryBaseline) {
+    // Scale each template region's own entry spacing baseline proportionally.
+    vars['--resume-entry-factor'] = (s.spacing.entry / entryBaseline.value) * entryBaseline.density;
+  } else if (s.spacing?.entry !== undefined) {
+    vars['--resume-entry'] = `${s.spacing.entry}px`;
+  }
   if (s.density) {
     vars['--resume-density'] = s.density === 'compact' ? 0.8 : 1.2;
     vars['--resume-line-factor'] = s.density === 'compact' ? 0.95 : 1.05;

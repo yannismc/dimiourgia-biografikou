@@ -20,6 +20,7 @@ export const previewEditorTargets: Record<string, EditorTarget> = {
   publications: { section: 'activities', panel: 'publications' },
   languages: { section: 'skills-and-expertise', panel: 'Languages' },
   technologies: { section: 'skills-and-expertise', panel: 'Technologies' },
+  frameworks: { section: 'skills-and-expertise', panel: 'Frameworks' },
   frameworks_libs: { section: 'skills-and-expertise', panel: 'Frameworks' },
   tools: { section: 'skills-and-expertise', panel: 'Tools' },
   tech_expertise: { section: 'skills-and-expertise', panel: 'Languages' },

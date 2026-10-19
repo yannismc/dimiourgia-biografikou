@@ -29,7 +29,7 @@ export const HTMLRenderer = ({ htmlString }: { htmlString: string }) => {
         // global controls reach the wrapper instead of stopping at its parent.
         fontSize: 'calc(var(--resume-body, 0.75rem) * var(--resume-fit-scale, 1))',
         lineHeight:
-          'calc(var(--resume-line-height, calc(1rem * var(--resume-line-factor, 1))) * var(--resume-fit-scale, 1))',
+          'calc(var(--resume-line-height, var(--resume-richtext-line-height, calc(1rem * var(--resume-line-factor, 1)))) * var(--resume-fit-scale, 1))',
       }}
     >
       {parsedElement}

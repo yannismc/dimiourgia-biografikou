@@ -1,18 +1,15 @@
-import { useTemplates } from '@/stores/useTemplate';
-import type { ReactNode } from 'react';
+import { useContext, type ReactNode } from 'react';
+import { ResumeReadOnlyContext } from '@/modules/builder/resume/ResumeReadOnlyContext';
 import { previewEditorTargets, useEditorStore } from '@/stores/useEditorStore';
 import { useSectionLayoutStore } from '@/stores/useSectionLayoutStore';
 
 /** Shared by preview sections and fixed profile/contact areas across templates. */
 export function EditableResumeSection({ id, children }: { id: string; children: ReactNode }) {
+  const readOnly = useContext(ResumeReadOnlyContext);
   const isReorderMode = useSectionLayoutStore((state) => state.isReorderMode);
-  const templateId = useTemplates((state) => state.activeTemplate.id);
-  const target =
-    id === 'awards' && templateId === 'sidebar-left'
-      ? previewEditorTargets.achievements
-      : previewEditorTargets[id];
+  const target = previewEditorTargets[id];
   const openEditor = useEditorStore((state) => state.openEditor);
-  if (!target || isReorderMode) return <div className="relative">{children}</div>;
+  if (readOnly || !target || isReorderMode) return <div className="relative">{children}</div>;
 
   return (
     <div

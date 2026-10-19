@@ -1,7 +1,8 @@
 import { font, bodySize, lineHeight } from '@/helpers/resume-style/styles';
 import styled from '@emotion/styled';
 import { HTMLRenderer } from '@/helpers/common/components/HTMLRenderer';
-import type { ResumePalette } from '../theme/resumePalette';
+import { usePresentation } from '@/templates/components/theme';
+import type { ResumePalette } from '@/templates/components/theme/resumePalette';
 import type { CSSProperties } from 'react';
 
 const Content = styled.div`
@@ -10,6 +11,9 @@ const Content = styled.div`
   overflow-wrap: anywhere;
   & a {
     color: var(--resume-link-color, inherit);
+    text-decoration: none;
+  }
+  &[data-spacious] > div a {
     text-decoration: none;
   }
   & img,
@@ -27,18 +31,22 @@ const Content = styled.div`
     white-space: pre-wrap;
   }
 `;
-export const RichText = ({ html, p }: { html: string; p: ResumePalette }) => (
-  <Content
-    style={
-      {
-        '--resume-link-color': p.accent,
-        color: p.text,
-        fontSize: bodySize(11),
-        lineHeight: lineHeight(1.5),
-        fontFamily: font(p.bodyFont),
-      } as CSSProperties
-    }
-  >
-    <HTMLRenderer htmlString={html} />
-  </Content>
-);
+export const RichText = ({ html, p }: { html: string; p: ResumePalette }) => {
+  const presentation = usePresentation();
+  return (
+    <Content
+      data-spacious={presentation === 'ruled' || undefined}
+      style={
+        {
+          '--resume-link-color': p.accent,
+          color: p.text,
+          fontSize: bodySize(11),
+          lineHeight: `var(--resume-section-line-height, ${lineHeight(1.5)})`,
+          fontFamily: font(p.bodyFont),
+        } as CSSProperties
+      }
+    >
+      <HTMLRenderer htmlString={html} />
+    </Content>
+  );
+};

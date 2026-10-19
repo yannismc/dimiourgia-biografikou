@@ -4,6 +4,20 @@ import { HTMLRenderer } from './HTMLRenderer';
 import { styleVariables } from '@/helpers/resume-style/styles';
 
 describe('rich text layout customization', () => {
+  it('opens section links in a new tab regardless of their saved target', () => {
+    render(
+      <HTMLRenderer htmlString='<p><a href="https://example.com/experience">Experience</a> <a href="https://example.com/activities" target="_self"><strong>Activities</strong></a></p>' />
+    );
+
+    for (const name of ['Experience', 'Activities']) {
+      const link = screen.getByRole('link', { name });
+      expect(link).toHaveAttribute('href', `https://example.com/${name.toLowerCase()}`);
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    }
+    expect(screen.getByText('Activities').tagName).toBe('STRONG');
+  });
+
   it('allows body and line-height settings through its formerly fixed text-xs wrapper', () => {
     const view = render(
       <div style={styleVariables({ typography: { body: 16, lineHeight: 1.8 } })}>
@@ -13,7 +27,7 @@ describe('rich text layout customization', () => {
     const wrapper = screen.getByText('Resume description').parentElement!;
     expect(wrapper.style.fontSize).toBe('var(--resume-body, 0.75rem)');
     expect(wrapper.style.lineHeight).toBe(
-      'var(--resume-line-height, calc(1rem * var(--resume-line-factor, 1)))'
+      'var(--resume-line-height, var(--resume-richtext-line-height, calc(1rem * var(--resume-line-factor, 1))))'
     );
     expect(wrapper.parentElement!.style.getPropertyValue('--resume-body')).toBe('16px');
     view.rerender(

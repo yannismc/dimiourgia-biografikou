@@ -42,6 +42,8 @@ export const RichtextEditor = memo(({ label, onChange, value }: IRichtext) => {
           events: {
             beforePasteInsert: (html: unknown) =>
               typeof html === 'string' ? sanitizeRichText(html) : undefined,
+            // Jodit calls this without a value when syncing typing/toolbar changes.
+            // Returning a string then would replace the live editor content.
             beforeSetValueToEditor: (html: unknown) =>
               typeof html === 'string' ? sanitizeRichText(html) : undefined,
           },
@@ -77,6 +79,7 @@ export const RichtextEditor = memo(({ label, onChange, value }: IRichtext) => {
     if (editorRef.current && editorInstanceCreated) {
       const editor = editorRef.current;
       const handleChange = (html: string) => onChange(sanitizeRichText(html));
+      // Persist cleanup of formatting already present in saved resumes.
       const cleaned = sanitizeRichText(value);
       if (cleaned !== value) onChange(cleaned);
       editor.events.on('change', handleChange);

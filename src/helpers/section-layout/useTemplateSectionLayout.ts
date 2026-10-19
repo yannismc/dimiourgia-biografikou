@@ -86,10 +86,19 @@ export function useTemplateSectionLayout(templateId: string, allowed: Set<string
       : academicCvRegions;
   }, [stored, templateId, config.defaults, config.regionKeys]);
 
-  const regions = useMemo(
-    () => normalizeRegionLayout(migratedStored, allowed, config.defaults, config.regionKeys),
-    [migratedStored, allowed, config.defaults, config.regionKeys]
-  );
+  const regions = useMemo(() => {
+    const normalized = normalizeRegionLayout(
+      migratedStored,
+      allowed,
+      config.defaults,
+      config.regionKeys
+    );
+    // Keep Classic education as the closing section, including saved layouts.
+    if (templateId === 'classic' && normalized.main?.includes('education')) {
+      normalized.main = normalized.main.filter((id) => id !== 'education').concat('education');
+    }
+    return normalized;
+  }, [templateId, migratedStored, allowed, config.defaults, config.regionKeys]);
 
   const setRegions = useCallback(
     (next: Record<string, string[]>) => {

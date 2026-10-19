@@ -12,7 +12,19 @@ export function PagedResume({ children }: { children: ReactNode }) {
   const templateId = useTemplates((state) => state.activeTemplate.id);
   const secondaryDefault = TEMPLATE_REGISTRY[templateId]?.style.secondaryColumnPercent;
   const isMultiPage = TEMPLATE_REGISTRY[templateId]?.style.pages === 2;
-  const variables = styleVariables(settings);
+  const variables = styleVariables(settings, {
+    value: (TEMPLATE_REGISTRY[templateId] ?? TEMPLATE_REGISTRY.modern).style.entry,
+    density: templateId === 'modern' ? 0.8 : 1,
+  });
+  // Modern's balanced baseline uses the former compact spacing and line height.
+  if (templateId === 'modern') {
+    Object.assign(variables, {
+      '--resume-density':
+        0.8 * (settings.density === 'compact' ? 0.8 : settings.density === 'spacious' ? 1.2 : 1),
+      '--resume-line-factor':
+        0.95 * (settings.density === 'compact' ? 0.95 : settings.density === 'spacious' ? 1.05 : 1),
+    });
+  }
   if (
     secondaryDefault !== undefined &&
     (settings.spacing?.column !== undefined || settings.density)

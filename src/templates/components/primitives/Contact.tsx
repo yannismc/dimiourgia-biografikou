@@ -12,11 +12,15 @@ export const ContactLine = ({
   text,
   href,
   density = 'compact',
+  size,
+  underlineLinks = false,
 }: {
   icon: ReactNode;
   text: string;
   href?: string;
   density?: SectionProps['density'];
+  size?: number;
+  underlineLinks?: boolean;
 }) => {
   const palette = useSurfacePalette();
   if (!text) return null;
@@ -26,7 +30,7 @@ export const ContactLine = ({
         display: 'inline-flex',
         alignItems: 'center',
         gap: 6,
-        fontSize: bodySize(density === 'comfortable' ? 12 : 10.5),
+        fontSize: bodySize(size ?? (density === 'comfortable' ? 12 : 10.5)),
         lineHeight: lineHeight(1.4),
         overflowWrap: 'anywhere',
       }}
@@ -43,7 +47,10 @@ export const ContactLine = ({
         href={href}
         target="_blank"
         rel="noreferrer"
-        style={{ color: /^(mailto:|tel:)/i.test(href) ? 'inherit' : palette.accent }}
+        style={{
+          color: /^(mailto:|tel:)/i.test(href) ? 'inherit' : palette.accent,
+          textDecoration: underlineLinks ? undefined : 'none',
+        }}
       >
         {body}
       </a>
@@ -60,6 +67,8 @@ export const ContactBlock = ({
   inline,
   color,
   density,
+  size,
+  underlineLinks = false,
   align = 'left',
 }: {
   email?: string;
@@ -69,7 +78,9 @@ export const ContactBlock = ({
   inline?: boolean;
   color?: string;
   density?: SectionProps['density'];
-  align?: 'left' | 'right';
+  size?: number;
+  underlineLinks?: boolean;
+  align?: 'left' | 'center' | 'right';
 }) => {
   return (
     <div
@@ -80,33 +91,75 @@ export const ContactBlock = ({
         gap: inline ? 12 : 6,
         textAlign: align,
         alignItems: !inline && align === 'right' ? 'flex-end' : undefined,
-        justifyContent: inline && align === 'right' ? 'flex-end' : undefined,
+        justifyContent: inline
+          ? align === 'center'
+            ? 'center'
+            : align === 'right'
+              ? 'flex-end'
+              : undefined
+          : undefined,
         color: color || 'inherit',
       }}
     >
       <ContactLine
         density={density}
+        size={size}
+        underlineLinks={underlineLinks}
         icon={<BsTelephone />}
         text={phone || ''}
         href={phone ? `tel:${phone}` : undefined}
       />
       <ContactLine
         density={density}
+        size={size}
+        underlineLinks={underlineLinks}
         icon={<BsEnvelope />}
         text={email || ''}
         href={email ? `mailto:${email}` : undefined}
       />
-      <ContactLine density={density} icon={<BsGeoAlt />} text={city || ''} />
-      <ContactLine density={density} icon={<BsGlobe />} text={url || ''} href={url} />
+      <ContactLine
+        density={density}
+        size={size}
+        underlineLinks={underlineLinks}
+        icon={<BsGeoAlt />}
+        text={city || ''}
+      />
+      <ContactLine
+        density={density}
+        size={size}
+        underlineLinks={underlineLinks}
+        icon={<BsGlobe />}
+        text={url || ''}
+        href={url}
+      />
     </div>
   );
 };
 
-export const SocialIconsRow = ({ profiles, color }: { profiles?: IProfile[]; color?: string }) => {
+export const SocialIconsRow = ({
+  profiles,
+  color,
+  size = 13,
+  align = 'left',
+  underlineLinks = false,
+}: {
+  profiles?: IProfile[];
+  color?: string;
+  size?: number;
+  align?: 'left' | 'center' | 'right';
+  underlineLinks?: boolean;
+}) => {
   const palette = useSurfacePalette();
   if (!profiles?.length) return null;
   return (
-    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+    <div
+      style={{
+        display: 'flex',
+        gap: 8,
+        flexWrap: 'wrap',
+        justifyContent: align === 'center' ? 'center' : align === 'right' ? 'flex-end' : undefined,
+      }}
+    >
       {profiles.map((p) => {
         const Icon = socialIcons.get(p.network.toLowerCase());
         if (!p.url) return null;
@@ -117,10 +170,14 @@ export const SocialIconsRow = ({ profiles, color }: { profiles?: IProfile[]; col
             href={p.url}
             target="_blank"
             rel="noreferrer"
-            style={{ color: color || palette.accent, display: 'inline-flex' }}
+            style={{
+              color: color || palette.accent,
+              display: 'inline-flex',
+              textDecoration: underlineLinks ? undefined : 'none',
+            }}
           >
             {Icon ? (
-              <Icon size={13} aria-hidden />
+              <Icon size={size} aria-hidden />
             ) : (
               <span>{p.network || p.username || p.url}</span>
             )}

@@ -1,4 +1,4 @@
-// Keep pasted and saved rich text within the editor's formatting vocabulary.
+// Keep the same formatting vocabulary as the editor toolbar. Run only in the browser.
 export function sanitizeRichText(html: string | null | undefined): string {
   const root = document.createElement('template');
   root.innerHTML = html ?? '';
@@ -25,6 +25,7 @@ export function sanitizeRichText(html: string | null | undefined): string {
         }
         clean(child);
         if (!allowed.has(child.tagName)) {
+          // Preserve block boundaries when flattening headings and pasted containers.
           if (/^(H[1-6]|BLOCKQUOTE|PRE|SECTION|ARTICLE|TR)$/.test(child.tagName)) {
             const block = document.createElement('div');
             block.append(...Array.from(child.childNodes));
@@ -60,7 +61,6 @@ export function sanitizeRichText(html: string | null | undefined): string {
       }
     }
   };
-
   clean(root.content);
   return root.innerHTML;
 }

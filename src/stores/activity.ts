@@ -1,3 +1,4 @@
+import { browserResumeStorage } from './browserResumeStorage';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { produce } from 'immer';
@@ -57,6 +58,8 @@ export const useActivity = create<IActivityStore>()(
       updateResearchInterests: updateResearchInterests(set),
     }),
     {
+      skipHydration: true,
+      storage: browserResumeStorage,
       name: 'activities',
       merge: (persistedState, currentState) => {
         const persisted = persistedState as Partial<IActivityStore>;

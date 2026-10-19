@@ -1,5 +1,5 @@
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useCloudResumeStore } from '@/stores/useCloudResumeStore';
+import { ChangeEvent, type RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { NavBarActions, NavBarMenu, StyledButton } from './atoms';
 import {
   useDatabases,
@@ -16,8 +16,10 @@ import DEFAULT_RESUME_JSON from '@/helpers/constants/resumes/Anonym.el.json';
 import Image from '@/helpers/common/components/Image';
 import Link from 'next/link';
 import { NavMenuItem } from './components/MenuItem';
+import { ExportSelect } from './components/ExportSelect';
 import { PrintResume } from './components/PrintResume';
 import { TemplateSelect } from './components/TemplateSelect';
+import { TitlesSelect } from './components/TitlesSelect';
 import { LayoutSelect } from './components/LayoutSelect';
 import { ThemeSelect } from './components/ThemeSelect';
 import { Toast } from '@/helpers/common/atoms/Toast';
@@ -28,61 +30,87 @@ import { useBasicDetails } from '@/stores/basic';
 import { useEducations } from '@/stores/education';
 import { useExperiences } from '@/stores/experience';
 import { useVoluteeringStore } from '@/stores/volunteering';
-import { Menu, MenuItem } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  InputAdornment,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
+  Menu,
+  MenuItem,
+  TextField,
+} from '@mui/material';
 import { applyImportedResumeJson } from './applyImportedResume';
-import { fetchAndApplyResumeFromUrl, formatImportUrlError } from './fetchResumeFromUrl';
+import { exportResumeMetadata } from './resumeMetadata';
 
 const TOTAL_TEMPLATES_AVAILABLE = Object.keys(AVAILABLE_TEMPLATES).length;
 
-const NavBarLayout = () => {
-  const router = useRouter();
-  const importUrlFromQuery = router.query.importUrl;
+const NavBarLayout = ({
+  importControllerRef,
+}: {
+  importControllerRef: RefObject<AbortController | null>;
+}) => {
   const [openToast, setOpenToast] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [savedId, setSavedId] = useState<string | null>(null);
+  const [showEditReminder, setShowEditReminder] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
+  const [linkMode, setLinkMode] = useState<'view' | 'edit'>('view');
+  const cloudCode = useCloudResumeStore((state) => state.code);
+  let savedUrl = '';
+  if (savedId) {
+    const url = new URL(window.location.href);
+    url.pathname = `/builder/${savedId}`;
+    url.searchParams.delete('importUrl');
+    url.searchParams.set('mode', linkMode);
+    if (linkMode === 'edit' && cloudCode) url.searchParams.set('code', cloudCode);
+    else url.searchParams.delete('code');
+    savedUrl = url.href;
+  }
+  const closeSavedDialog = () => {
+    const copiedCode = savedId ? useCloudResumeStore.getState().copiedEditCodes[savedId] : null;
+    if (!showEditReminder && cloudCode && copiedCode !== cloudCode) {
+      setShowEditReminder(true);
+    } else {
+      setSavedId(null);
+    }
+  };
+  const copyResumeLink = async (edit: boolean, closeAfterCopy = false) => {
+    if (!savedId || isCopying) return;
+    const id = savedId;
+    const code = cloudCode;
+    const url = new URL(savedUrl);
+    if (edit && code) {
+      url.searchParams.set('mode', 'edit');
+      url.searchParams.set('code', code);
+    }
+    setIsCopying(true);
+    try {
+      await navigator.clipboard.writeText(url.href);
+      if (edit && code) useCloudResumeStore.getState().markEditLinkCopied(id, code);
+      setToastContent('Resume link copied.');
+      if (closeAfterCopy) setSavedId((current) => (current === id ? null : current));
+    } catch {
+      if (closeAfterCopy) {
+        setLinkMode('edit');
+        setShowEditReminder(false);
+      }
+      setToastContent('Could not copy the link. Please select and copy it manually.');
+    } finally {
+      setIsCopying(false);
+      setOpenToast(true);
+    }
+  };
+  const exportInProgress = useRef(false);
   const [toastContent, setToastContent] = useState('');
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const fileInputRef = useRef(null);
-  const importControllerRef = useRef<AbortController | null>(null);
-
-  /** Auto-import when opening `/builder?importUrl=<encoded JSON URL>` (param removed after attempt). */
-  useEffect(() => {
-    if (!router.isReady) return;
-    const param =
-      typeof importUrlFromQuery === 'string'
-        ? importUrlFromQuery
-        : Array.isArray(importUrlFromQuery)
-          ? importUrlFromQuery[0]
-          : undefined;
-    if (!param) return;
-
-    let active = true;
-    const controller = new AbortController();
-    importControllerRef.current?.abort();
-    importControllerRef.current = controller;
-
-    void (async () => {
-      try {
-        await fetchAndApplyResumeFromUrl(param, controller.signal);
-        if (!active || controller.signal.aborted) return;
-        setToastContent('Resume data was successfully imported.');
-        setOpenToast(true);
-      } catch (e) {
-        if (!active || controller.signal.aborted) return;
-        setToastContent(formatImportUrlError(e));
-        setOpenToast(true);
-      }
-      if (!active || controller.signal.aborted) return;
-      const nextQuery = { ...router.query };
-      delete nextQuery.importUrl;
-      void router.replace({ pathname: router.pathname, query: nextQuery }, undefined, {
-        shallow: true,
-      });
-    })();
-
-    return () => {
-      active = false;
-      controller.abort();
-    };
-  }, [router, router.isReady, router.pathname, importUrlFromQuery]);
 
   useEffect(() => {
     const closeMobileMenu = () => setMenuAnchor(null);
@@ -98,63 +126,101 @@ const NavBarLayout = () => {
     setMenuAnchor(null);
   };
 
-  const exportResumeData = useCallback(() => {
-    const updatedResumeJson = {
-      ...DEFAULT_RESUME_JSON,
-      basics: {
-        ...DEFAULT_RESUME_JSON.basics,
-        ...useBasicDetails.getState().values,
-      },
-      work: useExperiences.getState().experiences,
-      education: useEducations.getState().academics,
-      awards: useAwards.getState().awards,
-      volunteer: useVoluteeringStore.getState().volunteeredExps,
-      skills: {
-        languages: useLanguages.getState().get(),
-        frameworks: useFrameworks.getState().get(),
-        technologies: useTechnologies.getState().get(),
-        libraries: useLibraries.getState().get(),
-        databases: useDatabases.getState().get(),
-        practices: usePractices.getState().get(),
-        tools: useTools.getState().get(),
-      },
-      activities: useActivity.getState().activities,
-    };
-    const fileName = updatedResumeJson.basics.name + '_' + new Date().toLocaleString();
-    const exportType = exportFromJSON.types.json;
-    exportFromJSON({
-      data: updatedResumeJson,
-      fileName,
-      exportType,
-    });
+  const exportResumeData = useCallback(async (destination: 'download' | 'cloud') => {
+    if (exportInProgress.current) return;
+    const cloudRevision = useCloudResumeStore.getState().revision;
+    exportInProgress.current = true;
+    setIsExporting(true);
+    try {
+      const updatedResumeJson = {
+        ...DEFAULT_RESUME_JSON,
+        __metadata: exportResumeMetadata(),
+        basics: {
+          ...DEFAULT_RESUME_JSON.basics,
+          ...useBasicDetails.getState().values,
+        },
+        work: useExperiences.getState().experiences,
+        education: useEducations.getState().academics,
+        awards: useAwards.getState().awards,
+        volunteer: useVoluteeringStore.getState().volunteeredExps,
+        skills: {
+          languages: useLanguages.getState().get(),
+          frameworks: useFrameworks.getState().get(),
+          technologies: useTechnologies.getState().get(),
+          libraries: useLibraries.getState().get(),
+          databases: useDatabases.getState().get(),
+          practices: usePractices.getState().get(),
+          tools: useTools.getState().get(),
+        },
+        activities: useActivity.getState().activities,
+      };
+      if (destination === 'cloud') {
+        const { id: activeId, code: activeCode } = useCloudResumeStore.getState();
+        const response = await fetch(
+          activeId ? `/api/resumes?id=${encodeURIComponent(activeId)}` : '/api/resumes',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(activeCode ? { 'X-Resume-Code': activeCode } : {}),
+            },
+            body: JSON.stringify(updatedResumeJson),
+          }
+        );
+        const result = await response.json();
+        if (useCloudResumeStore.getState().revision !== cloudRevision) return;
+        if (!response.ok) throw new Error(result.error || 'Could not save resume.');
+        useCloudResumeStore.getState().setId(result.id, activeId ? activeCode : result.code);
+        setShowEditReminder(false);
+        setLinkMode('view');
+        setSavedId(result.id);
+      } else {
+        const fileName = updatedResumeJson.basics.name + '_' + new Date().toLocaleString();
+        exportFromJSON({
+          data: updatedResumeJson,
+          fileName,
+          exportType: exportFromJSON.types.json,
+        });
+      }
+      handleMenuClose();
+    } catch (error) {
+      setToastContent(error instanceof Error ? error.message : 'Could not export resume.');
+      setOpenToast(true);
+    } finally {
+      exportInProgress.current = false;
+      setIsExporting(false);
+    }
   }, []);
 
-  const handleFileChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    const fileObj = event.target.files && event.target.files[0];
-    if (!fileObj) {
-      return;
-    }
+  const handleFileChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const fileObj = event.target.files && event.target.files[0];
+      if (!fileObj) {
+        return;
+      }
 
-    importControllerRef.current?.abort();
-    const reader = new FileReader();
+      importControllerRef.current?.abort();
+      const reader = new FileReader();
 
-    reader.readAsText(fileObj);
+      reader.readAsText(fileObj);
 
-    event.target.value = ''; // To read the same file
+      event.target.value = ''; // To read the same file
 
-    reader.onload = (e) => {
-      try {
-        if (typeof e.target?.result === 'string') {
-          applyImportedResumeJson(JSON.parse(e.target.result));
-          setToastContent('Resume data was successfully imported.');
+      reader.onload = (e) => {
+        try {
+          if (typeof e.target?.result === 'string') {
+            applyImportedResumeJson(JSON.parse(e.target.result));
+            setToastContent('Resume data was successfully imported.');
+            setOpenToast(true);
+          }
+        } catch {
+          setToastContent('Could not read resume JSON from file.');
           setOpenToast(true);
         }
-      } catch {
-        setToastContent('Could not read resume JSON from file.');
-        setOpenToast(true);
-      }
-    };
-  }, []);
+      };
+    },
+    [importControllerRef]
+  );
 
   return (
     <nav className="h-14 w-full bg-resume-800 relative flex py-2.5 pl-2 md:pl-5 pr-1 nd:pr-4 items-center shadow-level-8dp z-20 print:hidden">
@@ -168,15 +234,12 @@ const NavBarLayout = () => {
             popoverChildren={<TemplateSelect />}
           />
           <NavMenuItem caption="Colours" popoverChildren={<ThemeSelect />} />
-          <div className="hidden lg:block">
-            <NavMenuItem caption="Layout" popoverChildren={<LayoutSelect />} />
-          </div>
+          <NavMenuItem caption="Layout" popoverChildren={<LayoutSelect />} />
+          <NavMenuItem caption="Titles" popoverChildren={<TitlesSelect />} />
         </NavBarMenu>
         <div className="hidden md:flex">
           <NavBarActions>
-            <StyledButton variant="text" onClick={exportResumeData}>
-              Export
-            </StyledButton>
+            <ExportSelect onExport={exportResumeData} isExporting={isExporting} />
             <StyledButton
               variant="text"
               onClick={() => {
@@ -219,7 +282,7 @@ const NavBarLayout = () => {
           horizontal: 'right',
         }}
       >
-        <MenuItem onClick={exportResumeData}>Export</MenuItem>
+        <ExportSelect onExport={exportResumeData} isExporting={isExporting} isMenuButton />
         <MenuItem
           onClick={() => {
             if (fileInputRef.current) {
@@ -240,6 +303,97 @@ const NavBarLayout = () => {
         </MenuItem>
         <PrintResume isMenuButton />
       </Menu>
+      <Dialog
+        open={Boolean(savedId)}
+        onClose={closeSavedDialog}
+        fullWidth
+        maxWidth="sm"
+        aria-labelledby="resume-saved-title"
+      >
+        <DialogTitle id="resume-saved-title">
+          {showEditReminder ? 'Keep your edit link' : 'Resume saved successfully'}
+        </DialogTitle>
+        <DialogContent>
+          {showEditReminder ? (
+            <p className="text-sm">Save this link so you can edit your resume later.</p>
+          ) : (
+            <>
+              <FormControl sx={{ mt: 1 }}>
+                <FormLabel id="resume-link-mode-label">Choose a link to copy</FormLabel>
+                <RadioGroup
+                  aria-labelledby="resume-link-mode-label"
+                  value={linkMode}
+                  onChange={(_, value) => setLinkMode(value as 'view' | 'edit')}
+                >
+                  <FormControlLabel
+                    value="view"
+                    control={<Radio />}
+                    label="View only — for sharing"
+                  />
+                  <FormControlLabel
+                    value="edit"
+                    control={<Radio />}
+                    label="With edit option — for returning to edit"
+                  />
+                </RadioGroup>
+              </FormControl>
+              <p className="mb-3 text-sm text-resume-600">
+                {linkMode === 'view'
+                  ? 'Allows viewing only. The edit code is excluded.'
+                  : 'Allows anyone with this link to edit and update this resume.'}
+              </p>
+              <TextField
+                label="Resume link"
+                sx={{ mt: 1 }}
+                value={savedUrl}
+                fullWidth
+                slotProps={{
+                  input: {
+                    readOnly: true,
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Button
+                          aria-label="Copy resume link"
+                          disabled={isCopying}
+                          onClick={() => void copyResumeLink(linkMode === 'edit')}
+                        >
+                          Copy
+                        </Button>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+              <p className="mt-4 text-sm">
+                {linkMode === 'view' ? (
+                  'This link is for viewing your resume. You can share it with anybody.'
+                ) : (
+                  <>
+                    Keep this link only for editing your resume in the future.{' '}
+                    <strong>Do not share it with anybody else.</strong>
+                  </>
+                )}
+              </p>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          {showEditReminder ? (
+            <>
+              <Button onClick={() => setSavedId(null)}>Close anyway</Button>
+              <Button
+                variant="contained"
+                disabled={isCopying}
+                onClick={() => void copyResumeLink(true, true)}
+              >
+                Copy edit link &amp; close
+              </Button>
+            </>
+          ) : (
+            <Button onClick={closeSavedDialog}>Close</Button>
+          )}
+        </DialogActions>
+      </Dialog>
       <Toast
         open={openToast}
         onClose={() => {

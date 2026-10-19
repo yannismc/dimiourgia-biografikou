@@ -7,14 +7,22 @@ afterEach(() => {
   localStorage.clear();
 });
 
-it.each(['removed-template', '__proto__', 'constructor'])(
-  'recovers from invalid saved ID %s',
-  (id) => {
-    localStorage.setItem('selectedTemplateId', id);
-    restoreSavedTemplate();
-    expect(useTemplates.getState().activeTemplate.id).toBe('professional');
-  }
-);
+it.each([
+  'removed-template',
+  'sidebar-left',
+  'sidebar-right',
+  'header-band',
+  'creative',
+  'technical',
+  'plain',
+  'straightforward',
+  '__proto__',
+  'constructor',
+])('recovers from invalid saved ID %s', (id) => {
+  localStorage.setItem('selectedTemplateId', id);
+  restoreSavedTemplate();
+  expect(useTemplates.getState().activeTemplate.id).toBe('professional');
+});
 it('restores a valid saved template', () => {
   localStorage.setItem('selectedTemplateId', 'classic');
   restoreSavedTemplate();

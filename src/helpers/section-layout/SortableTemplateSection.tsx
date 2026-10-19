@@ -1,5 +1,7 @@
 'use client';
 
+import { ResumeReadOnlyContext } from '@/modules/builder/resume/ResumeReadOnlyContext';
+
 import { EditableResumeSection } from '@/helpers/common/components/EditableResumeSection';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -19,7 +21,8 @@ export function SortableTemplateSection({
   language?: 'en' | 'el';
 }) {
   const regionId = useContext(ResumeSortableRegionContext);
-  const isReorderMode = useSectionLayoutStore((state) => state.isReorderMode);
+  const readOnly = useContext(ResumeReadOnlyContext);
+  const isReorderMode = useSectionLayoutStore((state) => state.isReorderMode) && !readOnly;
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
     disabled: !isReorderMode,

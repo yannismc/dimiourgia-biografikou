@@ -24,6 +24,7 @@ export const SECTION_IDS = {
   awards: 'awards',
   objective: 'objective',
   languages: 'languages',
+  frameworks: 'frameworks',
   technologies: 'technologies',
   frameworksLibs: 'frameworks_libs',
   tools: 'tools',

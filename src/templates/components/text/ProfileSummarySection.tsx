@@ -4,18 +4,32 @@ import { hasContent } from '../primitives/content';
 import { useSurfacePalette } from '../theme';
 import type { TextProps } from '../types';
 
+const SummaryContent = styled.div`
+  display: flow-root;
+  text-align: justify;
+
+  &[data-indent] p {
+    text-indent: 2em;
+  }
+
+  &[data-indent] li p {
+    text-indent: 0;
+  }
+`;
+
 export function ProfileSummarySection({
   html,
   image,
   title = 'Summary',
   imageAlt = 'Profile',
   density,
-}: TextProps & { image?: string; imageAlt?: string }) {
+  indentParagraphs = false,
+}: TextProps & { image?: string; imageAlt?: string; indentParagraphs?: boolean }) {
   const p = useSurfacePalette();
   if (!hasContent(html)) return null;
   return (
     <SectionFrame title={title} density={density}>
-      <div style={{ display: 'flow-root', textAlign: 'justify' }}>
+      <SummaryContent data-indent={indentParagraphs || undefined}>
         {image && (
           <img
             src={image}
@@ -33,7 +47,8 @@ export function ProfileSummarySection({
           />
         )}
         <RichText html={html!} p={p} />
-      </div>
+      </SummaryContent>
     </SectionFrame>
   );
 }
+import styled from '@emotion/styled';

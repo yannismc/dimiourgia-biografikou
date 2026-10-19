@@ -40,6 +40,7 @@ export const involvement = (r: any) => hasLen(r.activities?.involvements);
 export const achievements = (r: any) => hasLen(r.activities?.achievements);
 export const publications = (r: any) => hasLen(r.activities?.publications);
 export const languages = (r: any) => hasLen(r.skills?.languages);
+export const frameworks = (r: any) => hasLen(r.skills?.frameworks);
 const PROGRAMMING_LANGUAGE =
   /^(python|matlab|r|c|c\+\+|c#|java|javascript|typescript|julia|go|rust|php|ruby|bash|shell|sql|fortran|scala|kotlin|swift|objective-c|html|css|stata|sas|perl|haskell|lua|octave|wolfram(?: language)?|mathematica)$/i;
 export const isProgrammingLanguage = (name: string) => PROGRAMMING_LANGUAGE.test(name.trim());

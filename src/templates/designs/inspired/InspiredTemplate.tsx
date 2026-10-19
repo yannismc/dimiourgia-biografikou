@@ -5,13 +5,76 @@ import { useContext } from 'react';
 import { useSectionLayoutRuntime } from '@/helpers/section-layout';
 import { StateContext } from '@/modules/builder/resume/ResumeLayout';
 import { pageStyle } from '@/templates/components/primitives/layoutPrimitives';
-import { ResumePresentation, useResumePalette, withAlpha } from '@/templates/components/theme';
+import { H1, Label } from '@/templates/components/primitives/layoutPrimitives';
+import {
+  ResumePresentation,
+  ResumeSurface,
+  useResumePalette,
+  useSurfacePalette,
+  withAlpha,
+} from '@/templates/components/theme';
 import { TemplateRegion } from '@/templates/designs/integration/TemplateRegion';
 import { CompactEducation } from '@/templates/components/education';
 import { StandardExperience } from '@/templates/components/experience';
-import { CardProfile } from '@/templates/components/profile';
+import { InlineContacts } from '@/templates/components/contact';
 import { BarSkills, ChipSkills } from '@/templates/components/skills';
 import { TextSection } from '@/templates/components/text';
+import type { ProfileBasics } from '@/templates/components/types';
+
+function InspiredProfileCard({ basics }: { basics: ProfileBasics }) {
+  const p = useSurfacePalette();
+  return (
+    <div
+      style={{
+        flex: '1 1 180px',
+        minWidth: 0,
+        background: p.bg,
+        color: p.text,
+        padding: '16px 20px',
+        borderRadius: 8,
+      }}
+    >
+      <H1 p={p}>{basics.name}</H1>
+      <Label p={p}>{basics.label}</Label>
+      <div style={{ marginTop: 10 }}>
+        <InlineContacts basics={basics} />
+      </div>
+    </div>
+  );
+}
+
+function InspiredProfile({ basics }: { basics: ProfileBasics }) {
+  const p = useSurfacePalette();
+  return (
+    <header
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        gap: 18,
+        padding: padding('28px 32px 16px'),
+        position: 'relative',
+      }}
+    >
+      {basics.image && (
+        <img
+          src={basics.image}
+          alt=""
+          style={{
+            width: 84,
+            height: 84,
+            objectFit: 'cover',
+            borderRadius: '50%',
+            border: `4px solid ${p.primary}`,
+          }}
+        />
+      )}
+      <ResumeSurface surface="sidebar">
+        <InspiredProfileCard basics={basics} />
+      </ResumeSurface>
+    </header>
+  );
+}
 
 export default function InspiredTemplate() {
   const secondaryPercent = useResumeStyleStore((state) => state.settings.secondaryColumnPercent);
@@ -46,7 +109,7 @@ export default function InspiredTemplate() {
     <ResumePresentation value="standard">
       <div style={{ ...pageStyle(resumePalette), position: 'relative', overflow: 'hidden' }}>
         <EditableResumeSection id="basics">
-          <CardProfile basics={basics} />
+          <InspiredProfile basics={basics} />
         </EditableResumeSection>
         <div
           style={{

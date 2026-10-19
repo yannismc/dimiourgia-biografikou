@@ -4,10 +4,10 @@ import { IThemeColor, ITemplate } from './index.interface';
 
 export const SYSTEM_COLORS: IThemeColor[] = [
   {
-    backgroundColor: 'white',
-    fontColor: 'black',
-    titleColor: '#1890ff',
-    highlighterColor: 'yellowgreen',
+    backgroundColor: '#fffdf7',
+    fontColor: '#292524',
+    titleColor: '#1e3a8a',
+    highlighterColor: '#b45309',
     id: 1,
   },
   {
@@ -86,7 +86,7 @@ export const CUSTOM_THEME_COLOR: IThemeColor = {
   fontColor: '#1f2937',
   titleColor: '#1e3a5f',
   highlighterColor: '#0f766e',
-  id: 4,
+  id: 2,
 };
 
 export const DATE_PICKER_FORMAT = 'DD/MM/YYYY';

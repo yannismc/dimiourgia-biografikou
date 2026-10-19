@@ -3,12 +3,18 @@ import { JobHeader } from '../primitives/layoutPrimitives';
 import { RichText } from '../primitives/RichText';
 import { SectionFrame } from '../primitives/SectionFrame';
 import { formatDateRange, type DateLocale } from '../primitives/formatDateRange';
-import { useSurfacePalette, MONO_FONT } from '../theme';
+import { useSurfacePalette } from '../theme';
 import type { ExperienceItem, ItemsProps } from '../types';
+
+const MONO_FONT = "'SFMono-Regular', Consolas, monospace";
 
 type Props = ItemsProps<ExperienceItem> & {
   dateLocale?: DateLocale;
   yearOnlyIds?: readonly string[];
+  entrySpacing?: number;
+  summarySpacing?: number;
+  companyWeight?: number;
+  markerColor?: 'primary' | 'accent';
 };
 function Experience({
   items,
@@ -16,6 +22,10 @@ function Experience({
   density,
   dateLocale = 'en',
   yearOnlyIds = [],
+  entrySpacing = 12,
+  summarySpacing = 0,
+  companyWeight = 600,
+  markerColor = 'accent',
   design,
 }: Props & { design: 'standard' | 'stacked' | 'timeline' | 'technical' }) {
   const p = useSurfacePalette();
@@ -26,13 +36,13 @@ function Experience({
         <div
           key={item.id || index}
           style={{
-            marginBottom: design === 'timeline' ? 0 : spacing('entry', 12),
+            marginBottom: design === 'timeline' ? 0 : spacing('entry', entrySpacing),
             minWidth: 0,
             ...(design === 'timeline'
               ? {
                   position: 'relative',
                   paddingLeft: 20,
-                  paddingBottom: index === items.length - 1 ? 0 : spacing('entry', 12),
+                  paddingBottom: index === items.length - 1 ? 0 : spacing('entry', entrySpacing),
                   marginLeft: 5,
                 }
               : {}),
@@ -64,7 +74,7 @@ function Experience({
                 zIndex: 1,
                 width: 9,
                 height: 9,
-                border: `2px solid ${p.accent}`,
+                border: `2px solid ${p[markerColor]}`,
                 borderRadius: '50%',
                 background: p.bg,
               }}
@@ -90,7 +100,10 @@ function Experience({
             >
               <div style={{ minWidth: 0 }}>
                 <div
-                  style={{ fontWeight: 600, fontSize: bodySize(design === 'stacked' ? 15 : 12) }}
+                  style={{
+                    fontWeight: design === 'timeline' ? companyWeight : 600,
+                    fontSize: bodySize(design === 'stacked' ? 15 : 12),
+                  }}
                 >
                   {design === 'technical' ? (
                     <>
@@ -122,7 +135,13 @@ function Experience({
               </div>
             </div>
           )}
-          <RichText html={item.summary} p={p} />
+          {summarySpacing ? (
+            <div style={{ paddingTop: summarySpacing }}>
+              <RichText html={item.summary} p={p} />
+            </div>
+          ) : (
+            <RichText html={item.summary} p={p} />
+          )}
         </div>
       ))}
     </SectionFrame>
