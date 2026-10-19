@@ -241,7 +241,9 @@
       "isStudyingHere": false,
       "endDate": "2013-04-13T00:00:00.000Z",
       "score": "7,24 στα 10,00",
-      "courses": []
+      "courses": [],
+      "thesisTitle": "",
+      "thesisDetails": ""
     },
     {
       "id": "2",
@@ -253,7 +255,9 @@
       "isStudyingHere": false,
       "endDate": "2023-06-11T00:00:00.000Z",
       "score": "7,22 στα 10,00",
-      "courses": []
+      "courses": [],
+      "thesisTitle": "",
+      "thesisDetails": ""
     }
   ],
   "activities": {

@@ -57,6 +57,8 @@ const schema = {
       endDate: null,
       score: '',
       courses: [''],
+      thesisTitle: '',
+      thesisDetails: '',
       isStudyingHere: false,
     },
   ],

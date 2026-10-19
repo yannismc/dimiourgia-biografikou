@@ -12,6 +12,7 @@ import { useSectionLayoutRuntime } from '@/helpers/section-layout';
 import { TemplateRegion } from '@/templates/designs/integration/TemplateRegion';
 import { pageStyle } from '@/templates/components/primitives/layoutPrimitives';
 import { ResumePresentation, useResumePalette } from '@/templates/components/theme';
+import { getEducationThesis } from '@/helpers/educationThesis';
 import {
   useContext,
   useLayoutEffect,
@@ -251,50 +252,54 @@ export default function AcademicCvTemplate() {
       case 'education':
         return education.length ? (
           <AcademicSection title="Education">
-            {education.map((item, index) => (
-              <div className="academic-cv-entry" key={item.id || index}>
-                <EntryHeader
-                  title={item.institution}
-                  subtitle={item.isStudyingHere ? item.studyType : undefined}
-                  subtitleBold={item.isStudyingHere}
-                  date={formatDateRange(
-                    item.startDate,
-                    item.endDate,
-                    item.isStudyingHere,
-                    'en',
-                    true
+            {education.map((item, index) => {
+              const thesis = getEducationThesis(item);
+              const courses = item.courses?.filter(
+                (_, courseIndex) => courseIndex !== thesis.legacyCourseIndex
+              );
+              return (
+                <div className="academic-cv-entry" key={item.id || index}>
+                  <EntryHeader
+                    title={item.institution}
+                    subtitle={item.isStudyingHere ? item.studyType : undefined}
+                    subtitleBold={item.isStudyingHere}
+                    date={formatDateRange(
+                      item.startDate,
+                      item.endDate,
+                      item.isStudyingHere,
+                      'en',
+                      true
+                    )}
+                  />
+                  {!item.isStudyingHere && item.studyType && (
+                    <div className="academic-cv-degree">{item.studyType}</div>
                   )}
-                />
-                {!item.isStudyingHere && item.studyType && (
-                  <div className="academic-cv-degree">{item.studyType}</div>
-                )}
-                {item.area && (
-                  <div className="academic-cv-detail academic-cv-education-area">
-                    <AcademicRichText html={item.area} />
-                  </div>
-                )}
-                {item.score && (
-                  <div className="academic-cv-detail">
-                    <AcademicRichText html={item.score} />
-                  </div>
-                )}
-                {item.courses?.length > 0 && (
-                  <ul className="academic-cv-bullets">
-                    {item.courses.map((course, courseIndex) => (
-                      <li key={`${item.id || index}-course-${courseIndex}`}>
-                        {course.startsWith('Thesis: ') ? (
-                          <>
-                            <strong>Thesis:</strong> {course.slice('Thesis: '.length)}
-                          </>
-                        ) : (
-                          course
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
+                  {item.area && (
+                    <div className="academic-cv-detail academic-cv-education-area">
+                      <AcademicRichText html={item.area} />
+                    </div>
+                  )}
+                  {item.score && (
+                    <div className="academic-cv-detail">
+                      <AcademicRichText html={item.score} />
+                    </div>
+                  )}
+                  {(thesis.title || thesis.details) && (
+                    <div className="academic-cv-thesis">
+                      <strong>Thesis:</strong> {thesis.title && <strong>{thesis.title}</strong>}
+                      {thesis.details && <div className="academic-cv-detail">{thesis.details}</div>}
+                    </div>
+                  )}
+                  {courses?.length > 0 && (
+                    <ul className="academic-cv-bullets">
+                      {courses.map((course, courseIndex) => (
+                        <li key={`${item.id || index}-course-${courseIndex}`}>{course}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            })}
           </AcademicSection>
         ) : null;
       case 'work': {

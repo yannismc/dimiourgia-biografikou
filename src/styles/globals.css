@@ -222,6 +222,10 @@ body {
   font-weight: 700;
 }
 
+.academic-cv-thesis {
+  margin-top: 2px;
+}
+
 .academic-cv-bullets {
   margin: 2px 0 0;
   padding-left: 17px;

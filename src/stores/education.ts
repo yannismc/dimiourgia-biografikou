@@ -18,6 +18,8 @@ const addEducation =
     url,
     score,
     courses,
+    thesisTitle = '',
+    thesisDetails = '',
   }: IEducationItem) =>
     set(
       produce((state: IEducationStore) => {
@@ -32,6 +34,8 @@ const addEducation =
           url,
           courses,
           score,
+          thesisTitle,
+          thesisDetails,
         });
       })
     );

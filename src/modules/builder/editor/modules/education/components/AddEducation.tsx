@@ -13,6 +13,8 @@ const NEW_EDUCATION: IEducationItem = {
   endDate: null,
   score: '',
   courses: [],
+  thesisTitle: '',
+  thesisDetails: '',
   id: '',
 };
 

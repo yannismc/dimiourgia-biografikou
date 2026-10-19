@@ -6,6 +6,7 @@ import { useEducations } from '@/stores/education';
 import { IEducationItem } from '@/stores/education.interface';
 import { SwitchWidget } from '@/helpers/common/atoms/Switch';
 import { DATE_PICKER_FORMAT } from '@/helpers/constants';
+import { getEducationThesis } from '@/helpers/educationThesis';
 
 interface IEducationProps {
   educationInfo: IEducationItem;
@@ -17,6 +18,16 @@ const Education: React.FC<IEducationProps> = ({ educationInfo, currentIndex }) =
     // oxlint-disable-next-line typescript/no-explicit-any
     (name: string, value: any) => {
       const currentExpInfo = { ...educationInfo };
+      if (name === 'thesisTitle' || name === 'thesisDetails') {
+        const thesis = getEducationThesis(educationInfo);
+        currentExpInfo.thesisTitle = educationInfo.thesisTitle || thesis.title;
+        currentExpInfo.thesisDetails = educationInfo.thesisDetails || thesis.details;
+        if (thesis.legacyCourseIndex >= 0) {
+          currentExpInfo.courses = (educationInfo.courses ?? []).filter(
+            (_, index) => index !== thesis.legacyCourseIndex
+          );
+        }
+      }
       switch (name) {
         case 'academyName':
           currentExpInfo.institution = value;
@@ -26,6 +37,12 @@ const Education: React.FC<IEducationProps> = ({ educationInfo, currentIndex }) =
           break;
         case 'area':
           currentExpInfo.area = value;
+          break;
+        case 'thesisTitle':
+          currentExpInfo.thesisTitle = value;
+          break;
+        case 'thesisDetails':
+          currentExpInfo.thesisDetails = value;
           break;
         case 'grade':
           currentExpInfo.score = value;
@@ -92,6 +109,30 @@ const Education: React.FC<IEducationProps> = ({ educationInfo, currentIndex }) =
         autoComplete="off"
         fullWidth
         required
+        sx={{ marginBottom: '26px' }}
+      />
+      <TextField
+        label="Thesis title (optional)"
+        variant="filled"
+        value={educationInfo.thesisTitle || getEducationThesis(educationInfo).title}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          onChangeHandler('thesisTitle', e.target.value);
+        }}
+        autoComplete="off"
+        fullWidth
+        sx={{ marginBottom: '26px' }}
+      />
+      <TextField
+        label="Thesis details (optional)"
+        variant="filled"
+        value={educationInfo.thesisDetails || getEducationThesis(educationInfo).details}
+        onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+          onChangeHandler('thesisDetails', e.target.value);
+        }}
+        autoComplete="off"
+        fullWidth
+        multiline
+        minRows={3}
         sx={{ marginBottom: '26px' }}
       />
       <TextField

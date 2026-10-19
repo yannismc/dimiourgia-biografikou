@@ -8,6 +8,8 @@ export interface IEducationItem {
   endDate: string | null;
   score: string;
   courses: string[];
+  thesisTitle?: string;
+  thesisDetails?: string;
   id: string;
 }
 
