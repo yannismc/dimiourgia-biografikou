@@ -222,7 +222,7 @@ export default function AcademicCvTemplate() {
     switch (id) {
       case 'summary':
         return (
-          <AcademicSection title="About Me">
+          <AcademicSection title="Summary">
             <AcademicRichText html={basics.summary} />
           </AcademicSection>
         );
