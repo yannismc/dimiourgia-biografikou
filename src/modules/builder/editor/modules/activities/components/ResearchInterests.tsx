@@ -27,7 +27,7 @@ const ResearchInterests = () => {
 
   return (
     <div className="flex flex-col gap-3">
-      <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+      <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
         {interests.map((interest, index) => (
           <Chip
             key={`${interest}-${index}`}

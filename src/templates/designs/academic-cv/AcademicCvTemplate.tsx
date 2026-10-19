@@ -20,7 +20,10 @@ import {
   type CSSProperties,
   type ReactNode,
 } from 'react';
-import { isProgrammingLanguage } from '@/templates/designs/registry/predicates';
+import {
+  isProgrammingLanguage,
+  isResearchExperience,
+} from '@/templates/designs/registry/predicates';
 
 const BODY = '#111111';
 const FONT = "'CV Computer Modern', 'Latin Modern Roman', 'Times New Roman', serif";
