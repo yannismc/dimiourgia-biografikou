@@ -258,10 +258,14 @@ export default function AcademicCvTemplate() {
             {education.map((item, index) => {
               const thesis = getEducationThesis(item);
               const legacyThesisIndex = thesis.legacyCourseIndices[0];
-              const educationBullets = (item.courses ?? []).flatMap((course, courseIndex) => {
-                if (courseIndex === legacyThesisIndex) return [{ type: 'thesis' as const }];
-                if (thesis.legacyCourseIndices.includes(courseIndex)) return [];
-                return [{ type: 'course' as const, text: course }];
+              const educationBullets: ({ type: 'thesis' } | { type: 'course'; text: string })[] =
+                [];
+              (item.courses ?? []).forEach((course, courseIndex) => {
+                if (courseIndex === legacyThesisIndex) {
+                  educationBullets.push({ type: 'thesis' });
+                } else if (!thesis.legacyCourseIndices.includes(courseIndex)) {
+                  educationBullets.push({ type: 'course', text: course });
+                }
               });
               if (thesis.legacyCourseIndices.length === 0 && (thesis.title || thesis.details)) {
                 educationBullets.push({ type: 'thesis' });
