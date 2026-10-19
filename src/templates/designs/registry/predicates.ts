@@ -21,10 +21,12 @@ export const isTeiAthensExperience = (item: any) => {
 };
 export const isResearchExperience = (item: any) => {
   const institution = normalizeInstitution(item?.name);
+  const position = normalizeInstitution(item?.position);
   return (
     institution.includes('universite savoie mont blanc') ||
     isTeiAthensExperience(item) ||
-    institution.includes('εργαστηριο ανανεωσιμων πηγων ενεργειας')
+    institution.includes('εργαστηριο ανανεωσιμων πηγων ενεργειας') ||
+    /\b(research|doctoral|scientific|postdoc|postdoctoral)\b/.test(position)
   );
 };
 export const employmentExperience = (r: any) =>

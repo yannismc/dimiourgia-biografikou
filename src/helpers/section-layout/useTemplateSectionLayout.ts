@@ -62,19 +62,29 @@ function migrateProfessionalEducationSwap(
   return stored;
 }
 
+function migrateAcademicCvResearchExperienceOrder(stored: Record<string, string[]> | undefined) {
+  if (!stored?.page1?.includes('work') || !stored.page2?.includes('research_experience')) {
+    return stored;
+  }
+  return {
+    ...stored,
+    page1: [...stored.page1.filter((id) => id !== 'research_experience'), 'research_experience'],
+    page2: stored.page2.filter((id) => id !== 'research_experience'),
+  };
+}
+
 export function useTemplateSectionLayout(templateId: string, allowed: Set<string>) {
   const stored = useSectionLayoutStore((s) => s.layouts[templateId]);
   const setLayout = useSectionLayoutStore((s) => s.setLayout);
   const config = getTemplateSectionLayoutConfig(templateId);
-  const migratedStored = useMemo(
-    () => {
-      const regions = migrateNewRegions(stored, config.defaults, config.regionKeys);
-      return templateId === 'professional'
-        ? migrateProfessionalEducationSwap(regions, config.defaults)
-        : regions;
-    },
-    [stored, templateId, config.defaults, config.regionKeys]
-  );
+  const migratedStored = useMemo(() => {
+    const regions = migrateNewRegions(stored, config.defaults, config.regionKeys);
+    const academicCvRegions =
+      templateId === 'academic-cv' ? migrateAcademicCvResearchExperienceOrder(regions) : regions;
+    return templateId === 'professional'
+      ? migrateProfessionalEducationSwap(academicCvRegions, config.defaults)
+      : academicCvRegions;
+  }, [stored, templateId, config.defaults, config.regionKeys]);
 
   const regions = useMemo(
     () => normalizeRegionLayout(migratedStored, allowed, config.defaults, config.regionKeys),

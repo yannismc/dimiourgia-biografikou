@@ -145,16 +145,18 @@ function EntryHeader({
   date,
   subtitle,
   subtitleBold = false,
+  titleBold = true,
 }: {
   title: string;
   date?: string;
   subtitle?: string;
   subtitleBold?: boolean;
+  titleBold?: boolean;
 }) {
   return (
     <div className="academic-cv-entry-header">
       <div className="academic-cv-entry-title">
-        <strong>{title}</strong>
+        {titleBold ? <strong>{title}</strong> : title}
         {subtitle && (
           <span style={subtitleBold ? { fontWeight: 700 } : undefined}>{` – ${subtitle}`}</span>
         )}
@@ -222,7 +224,7 @@ export default function AcademicCvTemplate() {
     switch (id) {
       case 'summary':
         return (
-          <AcademicSection title="Summary">
+          <AcademicSection title="Research Interests">
             <AcademicRichText html={basics.summary} />
           </AcademicSection>
         );
@@ -234,6 +236,7 @@ export default function AcademicCvTemplate() {
               <div className="academic-cv-entry" key={item.id || index}>
                 <EntryHeader
                   title={item.position}
+                  titleBold={false}
                   date={formatDateRange(
                     item.startDate,
                     item.endDate,
@@ -254,9 +257,15 @@ export default function AcademicCvTemplate() {
           <AcademicSection title="Education">
             {education.map((item, index) => {
               const thesis = getEducationThesis(item);
-              const courses = item.courses?.filter(
-                (_, courseIndex) => !thesis.legacyCourseIndices.includes(courseIndex)
-              );
+              const legacyThesisIndex = thesis.legacyCourseIndices[0];
+              const educationBullets = (item.courses ?? []).flatMap((course, courseIndex) => {
+                if (courseIndex === legacyThesisIndex) return [{ type: 'thesis' as const }];
+                if (thesis.legacyCourseIndices.includes(courseIndex)) return [];
+                return [{ type: 'course' as const, text: course }];
+              });
+              if (thesis.legacyCourseIndices.length === 0 && (thesis.title || thesis.details)) {
+                educationBullets.push({ type: 'thesis' });
+              }
               return (
                 <div className="academic-cv-entry" key={item.id || index}>
                   <EntryHeader
@@ -284,17 +293,23 @@ export default function AcademicCvTemplate() {
                       <AcademicRichText html={item.score} />
                     </div>
                   )}
-                  {(thesis.title || thesis.details) && (
-                    <div className="academic-cv-thesis">
-                      <strong>Thesis:</strong> {thesis.title && <strong>{thesis.title}</strong>}
-                      {thesis.details && <div className="academic-cv-detail">{thesis.details}</div>}
-                    </div>
-                  )}
-                  {courses?.length > 0 && (
+                  {educationBullets.length > 0 && (
                     <ul className="academic-cv-bullets">
-                      {courses.map((course, courseIndex) => (
-                        <li key={`${item.id || index}-course-${courseIndex}`}>{course}</li>
-                      ))}
+                      {educationBullets.map((bullet, courseIndex) =>
+                        bullet.type === 'thesis' ? (
+                          <li key={`${item.id || index}-thesis-${courseIndex}`}>
+                            <strong>Thesis:</strong> {thesis.title && <>“{thesis.title}”</>}
+                            {thesis.details && (
+                              <>
+                                {thesis.title ? ' – ' : ''}
+                                {thesis.details}
+                              </>
+                            )}
+                          </li>
+                        ) : (
+                          <li key={`${item.id || index}-course-${courseIndex}`}>{bullet.text}</li>
+                        )
+                      )}
                     </ul>
                   )}
                 </div>

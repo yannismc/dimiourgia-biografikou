@@ -225,9 +225,12 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
     sectionLayout: {
       regionKeys: [REGION_IDS.page1, REGION_IDS.page2],
       defaults: {
-        [REGION_IDS.page1]: [SECTION_IDS.summary, SECTION_IDS.education, SECTION_IDS.work],
-        [REGION_IDS.page2]: [
+        [REGION_IDS.page1]: [
+          SECTION_IDS.summary,
+          SECTION_IDS.education,
           SECTION_IDS.researchExperience,
+        ],
+        [REGION_IDS.page2]: [
           SECTION_IDS.researchInterests,
           SECTION_IDS.awards,
           SECTION_IDS.publications,
