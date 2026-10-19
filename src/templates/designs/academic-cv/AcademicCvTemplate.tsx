@@ -255,7 +255,7 @@ export default function AcademicCvTemplate() {
             {education.map((item, index) => {
               const thesis = getEducationThesis(item);
               const courses = item.courses?.filter(
-                (_, courseIndex) => courseIndex !== thesis.legacyCourseIndex
+                (_, courseIndex) => !thesis.legacyCourseIndices.includes(courseIndex)
               );
               return (
                 <div className="academic-cv-entry" key={item.id || index}>

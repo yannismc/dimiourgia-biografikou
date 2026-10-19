@@ -22,9 +22,9 @@ const Education: React.FC<IEducationProps> = ({ educationInfo, currentIndex }) =
         const thesis = getEducationThesis(educationInfo);
         currentExpInfo.thesisTitle = educationInfo.thesisTitle || thesis.title;
         currentExpInfo.thesisDetails = educationInfo.thesisDetails || thesis.details;
-        if (thesis.legacyCourseIndex >= 0) {
+        if (thesis.legacyCourseIndices.length > 0) {
           currentExpInfo.courses = (educationInfo.courses ?? []).filter(
-            (_, index) => index !== thesis.legacyCourseIndex
+            (_, index) => !thesis.legacyCourseIndices.includes(index)
           );
         }
       }
