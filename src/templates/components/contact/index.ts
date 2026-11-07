@@ -1,1 +1,1 @@
-export { InlineContacts, ContactList } from './Contacts';
+export { InlineContacts, ContactList, ContactCard } from './Contacts';

@@ -26,6 +26,48 @@ export const SkillBar = ({ name, level, p }: { name: string; level: number; p: R
   );
 };
 
+export const SkillDots = ({
+  name,
+  level,
+  p,
+  total = 5,
+}: {
+  name: string;
+  level: number;
+  p: ResumePalette;
+  total?: number;
+}) => {
+  const norm = level > 5 ? Math.round((level / 100) * total) : level;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        gap: 8,
+        alignItems: 'center',
+        fontSize: bodySize(10.5),
+        marginBottom: spacing('entry', 4),
+      }}
+    >
+      <span>{name}</span>
+      <span style={{ display: 'inline-flex', gap: 3, flexShrink: 0 }}>
+        {Array.from({ length: total }).map((_, i) => (
+          <span
+            key={i}
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: i < norm ? p.accent : p.divider,
+              display: 'inline-block',
+            }}
+          />
+        ))}
+      </span>
+    </div>
+  );
+};
+
 export const ChipList = ({
   items,
   p,

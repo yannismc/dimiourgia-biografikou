@@ -129,11 +129,18 @@ describe('template coverage and destination placement', () => {
     expect(Object.keys(TEMPLATE_REGISTRY).sort()).toEqual([
       'academic-cv',
       'classic',
+      'creative',
+      'header-band',
       'inspired',
       'modern',
+      'plain',
       'professional',
       'professional-en',
+      'sidebar-left',
+      'sidebar-right',
       'spotlight',
+      'straightforward',
+      'technical',
       'two-page',
     ]);
   });

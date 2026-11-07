@@ -2,8 +2,12 @@ import { createContext, useContext, type ReactNode } from 'react';
 import Color from 'color';
 import { useResumePalette, withAlpha, type ResumePalette } from './resumePalette';
 
+export const EDITORIAL_FONT = 'Georgia, serif';
+export const MONO_FONT = "'SFMono-Regular', Consolas, monospace";
+
 export type Surface = 'page' | 'sidebar' | 'tinted' | 'accentTint';
-export type Presentation = 'standard' | 'underlined' | 'boxed' | 'ruled';
+export type Presentation =
+  'standard' | 'underlined' | 'boxed' | 'ruled' | 'editorial' | 'technical' | 'stacked';
 const SurfaceContext = createContext<ResumePalette | null>(null);
 const PresentationContext = createContext<Presentation>('standard');
 

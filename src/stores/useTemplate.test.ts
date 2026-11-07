@@ -7,26 +7,23 @@ afterEach(() => {
   localStorage.clear();
 });
 
-it.each([
-  'removed-template',
-  'sidebar-left',
-  'sidebar-right',
-  'header-band',
-  'creative',
-  'technical',
-  'plain',
-  'straightforward',
-  '__proto__',
-  'constructor',
-])('recovers from invalid saved ID %s', (id) => {
-  localStorage.setItem('selectedTemplateId', id);
-  restoreSavedTemplate();
-  expect(useTemplates.getState().activeTemplate.id).toBe('professional');
-});
+it.each(['removed-template', '__proto__', 'constructor'])(
+  'recovers from invalid saved ID %s',
+  (id) => {
+    localStorage.setItem('selectedTemplateId', id);
+    restoreSavedTemplate();
+    expect(useTemplates.getState().activeTemplate.id).toBe('professional');
+  }
+);
 it('restores a valid saved template', () => {
   localStorage.setItem('selectedTemplateId', 'classic');
   restoreSavedTemplate();
   expect(useTemplates.getState().activeTemplate.id).toBe('classic');
+});
+it('restores a valid saved template (new fork templates)', () => {
+  localStorage.setItem('selectedTemplateId', 'creative');
+  restoreSavedTemplate();
+  expect(useTemplates.getState().activeTemplate.id).toBe('creative');
 });
 it('supports blocked storage during hydration and selection', () => {
   vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
