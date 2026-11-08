@@ -7,13 +7,16 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Analytics } from '@vercel/analytics/next';
 import { GLOBAL_MUI_THEME } from '@/styles/global.theme';
+import { LanguageProvider } from '@/helpers/i18n/LanguageContext';
 
 export default function AppProviders({ children }: { children: ReactNode }) {
   return (
     <>
       <GlobalStyles styles="@layer theme, base, mui, components, utilities;" />
       <ThemeProvider theme={GLOBAL_MUI_THEME}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>{children}</LocalizationProvider>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <LanguageProvider>{children}</LanguageProvider>
+        </LocalizationProvider>
       </ThemeProvider>
       <Analytics />
     </>

@@ -1,43 +1,42 @@
+'use client';
+
 import Image from '@/helpers/common/components/Image';
 import Link from 'next/link';
+import { useLanguage } from '@/helpers/i18n/LanguageContext';
+import { messages } from '@/helpers/i18n/messages';
 
 function FeatureSection() {
+  const { locale } = useLanguage();
+  const t = messages[locale].home;
+
   return (
     <>
       <FeatureCard>
         <CardPinnnedIcon>
           <Image src="/icons/style.svg" alt="style" height="56" width="56" />
         </CardPinnnedIcon>
-        <p className="text-xl mr-14">
-          Customise with <strong>templates and themes</strong>!
-        </p>
+        <p className="text-xl mr-14">{t.featureTemplates}</p>
       </FeatureCard>
 
       <FeatureCard>
         <CardPinnnedIcon>
           <Image src="/icons/speed.svg" alt="speed" height="56" width="56" />
         </CardPinnnedIcon>
-        <p className="text-xl mr-14">
-          Simple <strong>interface</strong> that helps you build quicky!
-        </p>
+        <p className="text-xl mr-14">{t.featureInterface}</p>
       </FeatureCard>
 
       <FeatureCard>
         <CardPinnnedIcon>
           <Image src="/icons/magic.svg" alt="magic" height="56" width="56" />
         </CardPinnnedIcon>
-        <p className="text-xl mr-14">
-          No <strong>sign up </strong>needed — go straight to building!
-        </p>
+        <p className="text-xl mr-14">{t.featureNoSignup}</p>
       </FeatureCard>
 
       <FeatureCard>
         <CardPinnnedIcon>
           <Image src="/icons/lock.svg" alt="lock" height="56" width="56" />
         </CardPinnnedIcon>
-        <p className="text-xl mr-14">
-          Your <strong>data</strong> never leaves your device
-        </p>
+        <p className="text-xl mr-14">{t.featureData}</p>
       </FeatureCard>
     </>
   );
