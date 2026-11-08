@@ -8,6 +8,7 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter';
 import AppProviders from './providers';
 
 export const metadata: Metadata = {
+  title: 'E-Resume: Αρχική',
   description: 'Single Page Resume Builder',
   icons: { icon: { url: '/icons/resume-icon.png', type: 'image/png' } },
 };
@@ -20,7 +21,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth">
+    <html lang="el" className="scroll-smooth" data-scroll-behavior="smooth">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

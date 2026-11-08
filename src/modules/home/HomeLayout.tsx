@@ -9,6 +9,8 @@ import FeatureSection from './components/Feature';
 import Image from '@/helpers/common/components/Image';
 import Link from 'next/link';
 import Person from './components/Person';
+import { useLanguage } from '@/helpers/i18n/LanguageContext';
+import { messages } from '@/helpers/i18n/messages';
 
 const HomeLayout = () => {
   const controls = useAnimation();
@@ -24,6 +26,10 @@ const HomeLayout = () => {
     damping: 17,
   };
 
+  const { locale, setLocale } = useLanguage();
+  const t = messages[locale].home;
+  const n = messages[locale].nav;
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: [0, 1] }} className="scroll-smooth">
       <nav className="sticky top-0 z-20 h-14 w-full bg-resume-800 flex py-2.5 px-4 xl:px-60 items-center shadow-level-8dp">
@@ -33,16 +39,24 @@ const HomeLayout = () => {
         <div className="flex-auto flex justify-between items-center ml-5">
           <NavBarActions>
             <Link href="/builder" passHref={true}>
-              <StyledButton variant="text">Editor</StyledButton>
+              <StyledButton variant="text">{n.editor}</StyledButton>
             </Link>
           </NavBarActions>
           <NavBarActions>
             <Link href="#contribute" passHref={true} className="max-md:hidden">
-              <StyledButton variant="text">Contribute</StyledButton>
+              <StyledButton variant="text">{n.contribute}</StyledButton>
             </Link>
             <Link href="#about-us" passHref={true}>
-              <StyledButton variant="text">About us</StyledButton>
+              <StyledButton variant="text">{n.aboutUs}</StyledButton>
             </Link>
+            <button
+              type="button"
+              onClick={() => setLocale(locale === 'el' ? 'en' : 'el')}
+              aria-label={n.languageLabel}
+              className="text-white text-sm px-2 py-1 border border-white/40 rounded"
+            >
+              {locale === 'el' ? n.en : n.el}
+            </button>
             <a
               href={'https://github.com/sadanandpai/resume-builder'}
               target="_blank"
@@ -82,27 +96,27 @@ const HomeLayout = () => {
               />
             </div>
             <div className="col-span-12 sm:col-span-8">
-              <h3 className="text-xl md:text-2xl mb-2 text-resume-400">SIMPLEST WAY TO BUILD A</h3>
-              <h1 className="text-5xl mb-12 text-resume-800">Professional Resume</h1>
+              <h3 className="text-xl md:text-2xl mb-2 text-resume-400">{t.simplestWay}</h3>
+              <h1 className="text-5xl mb-12 text-resume-800">{t.professionalResume}</h1>
 
               <div className="flex mb-10">
                 <div className="bg-resume-800 w-1 rounded-lg"></div>
                 <p className="text-lg ml-3 text-resume-800">
-                  &ldquo;The secret to getting ahead is getting started&rdquo;
+                  {t.quote}
                   <br />
-                  —Mark Twain
+                  {t.quoteAuthor}
                 </p>
               </div>
               <Link href="/builder" passHref={true}>
                 <Button variant="contained" className="bg-resume-800 mb-2">
-                  BUILD YOUR RESUME
+                  {t.buildResume}
                 </Button>
               </Link>
               <p
                 className="xl:invisible text-resume-800"
                 style={{ fontFamily: "'Roboto Slab', serif" }}
               >
-                Desktop screen recommended
+                {t.desktopRecommended}
               </p>
             </div>
           </motion.div>
@@ -130,21 +144,17 @@ const HomeLayout = () => {
           <div className="grid grid-cols-12 items-center text-center">
             <div className="col-span-12 lg:col-span-4 mb-4 lg:mb-0 flex flex-col items-center gap-2">
               <Image src={'/icons/palette.svg'} alt="logo" height="48" width="48" />
-              <p className="text-resume-800 text-xl mt-2">
-                Do you want to make your own <strong>template?</strong>
-              </p>
+              <p className="text-resume-800 text-xl mt-2">{t.contributeTemplate}</p>
             </div>
             <div className="col-span-12 lg:col-span-1 mb-4 lg:mb-0 text-resume-800 text-4xl">
               <p>+</p>
             </div>
             <div className="col-span-12 lg:col-span-2 flex flex-col items-center gap-2">
               <Image src={'/icons/terminal.svg'} alt="logo" height="48" width="48" />
-              <p className="text-resume-800 text-xl mt-2">
-                Do you write <strong>React</strong> code?
-              </p>
+              <p className="text-resume-800 text-xl mt-2">{t.contributeReact}</p>
             </div>
             <div className="invisible lg:visible lg:col-span-2 text-resume-800 text-4xl mx-6">
-              <p>=</p>
+              <p>{t.contributeEquals}</p>
             </div>
             <div className="col-span-12 lg:col-span-3 mx-auto flex flex-col items-center gap-2">
               <div className="mb-6">
@@ -157,7 +167,7 @@ const HomeLayout = () => {
                   rel="noreferrer"
                 >
                   <Button variant="contained" className="bg-resume-800 mt-2 lg:mt-5 mb-3">
-                    CONTRIBUTE
+                    {t.contributeButton}
                   </Button>
                 </a>
               </div>
@@ -171,16 +181,13 @@ const HomeLayout = () => {
         className="mx-6 md:mx-40 xl:mx-60 my-32"
         style={{ fontFamily: "'Roboto Slab', serif" }}
       >
-        <h2 className="text-resume-800 text-3xl mb-2 text-center lg:text-left">About us</h2>
-        <p className="text-resume-400 mb-8 text-center lg:text-left">
-          A bunch of developers and designers — who love to build open source projects and learn
-          along!
-        </p>
+        <h2 className="text-resume-800 text-3xl mb-2 text-center lg:text-left">{t.aboutTitle}</h2>
+        <p className="text-resume-400 mb-8 text-center lg:text-left">{t.aboutSubtitle}</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <Person />
         </div>
         <p className="text-resume-400 my-8 text-center lg:text-left">
-          Read our design story on&nbsp;
+          {t.designStory}&nbsp;
           <a
             href="https://medium.com/@yakshag/e-resume-build-a-professional-resume-design-case-study-3dc02a6359ea"
             target="_blank"
@@ -191,6 +198,47 @@ const HomeLayout = () => {
           </a>
           ↗
         </p>
+
+        <div className="mt-12 rounded-xl border border-resume-100 bg-resume-50 p-6">
+          <h3 className="text-resume-800 text-2xl mb-4">{t.creditsTitle}</h3>
+          <p className="text-resume-400 mb-2">
+            <strong>{t.originalProject}</strong>{' '}
+            <a
+              href="https://github.com/sadanandpai/resume-builder"
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              sadanandpai/resume-builder
+            </a>
+          </p>
+          <p className="text-resume-400 mb-2">
+            <strong>{t.originalAuthors}</strong> Sadanand Pai, Gopalakrishnan, Vivek G, Siva K
+          </p>
+          <p className="text-resume-400 mb-2">
+            <strong>{t.maintainedBy}</strong> Ioannis Axaopoulos (yannismc) —{' '}
+            <a
+              href="https://github.com/yannismc/dimiourgia-biografikou"
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              yannismc/dimiourgia-biografikou
+            </a>
+          </p>
+          <p className="text-resume-400 mb-4">
+            <strong>{t.whatChanged}</strong>
+          </p>
+          <ul className="list-disc pl-6 text-resume-400 mb-4">
+            {t.changesList.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          <p className="text-resume-400 text-sm">{t.noEndorsement}</p>
+          <p className="text-resume-400 text-sm mt-2">
+            License: MIT. Original copyright notice and attribution are preserved.
+          </p>
+        </div>
       </div>
     </motion.div>
   );
