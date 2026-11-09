@@ -7,9 +7,15 @@ import { useThemes } from '@/stores/themes';
 import { useSectionTitleStore } from '@/stores/useSectionTitleStore';
 import { useSectionLayoutStore } from '@/stores/useSectionLayoutStore';
 import { useResumeStyleStore } from '@/stores/useResumeStyleStore';
+import {
+  isResumeLanguage,
+  useResumeLanguageStore,
+  type ResumeLanguage,
+} from '@/stores/useResumeLanguageStore';
 
 export type ResumeMetadata = {
   version: 1;
+  language?: ResumeLanguage;
   template: { id: string; name: string };
   titles: Record<string, string>;
   layout: Record<string, string[]>;
@@ -20,10 +26,12 @@ export type ResumeMetadata = {
 export function exportResumeMetadata(): ResumeMetadata {
   useSectionTitleStore.getState().hydrate();
   useResumeStyleStore.getState().hydrate();
+  useResumeLanguageStore.getState().hydrate();
   const { id, name } = useTemplates.getState().activeTemplate;
   const { selectedTheme, customTheme } = useThemes.getState();
   return {
     version: 1,
+    language: useResumeLanguageStore.getState().language,
     template: { id, name },
     titles: useSectionTitleStore.getState().titles[id] ?? {},
     layout: useSectionLayoutStore.getState().layouts[id] ?? {},
@@ -61,6 +69,9 @@ export function normalizeResumeMetadata(input: unknown): ResumeMetadata | undefi
   if (input === undefined) return undefined;
   const source = record(input);
   const template = record(source.template);
+  if (source.language !== undefined && !isResumeLanguage(source.language)) {
+    throw new Error('Unsupported resume language');
+  }
   if (
     source.version !== 1 ||
     typeof template.id !== 'string' ||
@@ -90,6 +101,7 @@ export function normalizeResumeMetadata(input: unknown): ResumeMetadata | undefi
   const colors = record(source.colors);
   return {
     version: 1,
+    language: source.language as ResumeLanguage | undefined,
     template: { id: template.id, name: AVAILABLE_TEMPLATES[template.id].name },
     titles,
     layout,
@@ -99,6 +111,7 @@ export function normalizeResumeMetadata(input: unknown): ResumeMetadata | undefi
 }
 
 export function applyResumeMetadata(metadata: ResumeMetadata): void {
+  useResumeLanguageStore.getState().setLanguage(metadata.language ?? 'en');
   const id = metadata.template.id;
   const titles = useSectionTitleStore.getState();
   titles.resetTemplate(id);

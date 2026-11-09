@@ -1,4 +1,15 @@
 export const TEMPLATE_SECTION_TITLES: Record<string, Record<string, string>> = {
+  'academic-cv': {
+    summary: 'Profile',
+    education: 'Education',
+    research_experience: 'Research Experience',
+    work: 'Professional Experience',
+    research_interests: 'Research Interests',
+    awards: 'Awards, Grants & Funding',
+    publications: 'Publications',
+    skills: 'Technical Skills',
+    languages: 'Languages',
+  },
   modern: {
     work: 'Work Experience',
     involvement: 'Key Projects / Involvements',

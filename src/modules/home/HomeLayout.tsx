@@ -8,7 +8,7 @@ import { Button } from '@mui/material';
 import FeatureSection from './components/Feature';
 import Image from '@/helpers/common/components/Image';
 import Link from 'next/link';
-import Person from './components/Person';
+import MaintainerProfile, { OriginalCreators } from './components/Person';
 import { useLanguage } from '@/helpers/i18n/LanguageContext';
 import { messages } from '@/helpers/i18n/messages';
 
@@ -32,11 +32,11 @@ const HomeLayout = () => {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: [0, 1] }} className="scroll-smooth">
-      <nav className="sticky top-0 z-20 h-14 w-full bg-resume-800 flex py-2.5 px-4 xl:px-60 items-center shadow-level-8dp">
+      <nav className="sticky top-0 z-20 min-h-14 w-full bg-resume-800 flex py-2.5 px-4 xl:px-60 items-center shadow-level-8dp">
         <Link href="/">
           <Image src={'/icons/resume-icon.png'} alt="logo" height="36" width="36" />
         </Link>
-        <div className="flex-auto flex justify-between items-center ml-5">
+        <div className="flex-auto flex flex-wrap gap-2 justify-between items-center ml-5">
           <NavBarActions>
             <Link href="/builder" passHref={true}>
               <StyledButton variant="text">{n.editor}</StyledButton>
@@ -58,7 +58,7 @@ const HomeLayout = () => {
               {locale === 'el' ? n.en : n.el}
             </button>
             <a
-              href={'https://github.com/sadanandpai/resume-builder'}
+              href={'https://github.com/yannismc/dimiourgia-biografikou'}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -162,7 +162,7 @@ const HomeLayout = () => {
               </div>
               <div>
                 <a
-                  href="https://github.com/sadanandpai/resume-builder"
+                  href="https://github.com/yannismc/dimiourgia-biografikou"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -183,63 +183,67 @@ const HomeLayout = () => {
       >
         <h2 className="text-resume-800 text-3xl mb-2 text-center lg:text-left">{t.aboutTitle}</h2>
         <p className="text-resume-400 mb-8 text-center lg:text-left">{t.aboutSubtitle}</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <Person />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          <MaintainerProfile role={t.maintainerRole} />
+          <div className="lg:col-span-2 rounded-xl border border-resume-100 bg-resume-50 p-6">
+            <h3 className="text-resume-800 text-2xl mb-4">{t.whatChanged}</h3>
+            <ul className="list-disc pl-6 text-resume-400 space-y-3 mb-6">
+              {t.changesList.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <p className="text-resume-400 break-words">
+              <strong>{t.maintainedBy}</strong>{' '}
+              <a
+                href="https://github.com/yannismc/dimiourgia-biografikou"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                yannismc/dimiourgia-biografikou
+              </a>
+            </p>
+          </div>
         </div>
-        <p className="text-resume-400 my-8 text-center lg:text-left">
-          {t.designStory}&nbsp;
+      </div>
+
+      <section
+        id="original-creators"
+        aria-labelledby="original-creators-title"
+        className="mx-6 md:mx-40 xl:mx-60 mb-20 rounded-xl border border-resume-100 bg-resume-50 p-6"
+        style={{ fontFamily: "'Roboto Slab', serif" }}
+      >
+        <h2 id="original-creators-title" className="text-resume-800 text-2xl mb-4">
+          {t.creditsTitle}
+        </h2>
+        <p className="text-resume-400 mb-6 break-words">
+          <strong>{t.originalProject}</strong>{' '}
+          <a
+            href="https://github.com/sadanandpai/resume-builder"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            sadanandpai/resume-builder
+          </a>
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <OriginalCreators />
+        </div>
+        <p className="text-resume-400 text-sm mt-6">{t.noEndorsement}</p>
+        <p className="text-resume-400 text-sm mt-2">{t.license}</p>
+        <p className="text-resume-400 mt-6">
+          {t.designStory}{' '}
           <a
             href="https://medium.com/@yakshag/e-resume-build-a-professional-resume-design-case-study-3dc02a6359ea"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="underline"
           >
-            Medium
+            Medium ↗
           </a>
-          ↗
         </p>
-
-        <div className="mt-12 rounded-xl border border-resume-100 bg-resume-50 p-6">
-          <h3 className="text-resume-800 text-2xl mb-4">{t.creditsTitle}</h3>
-          <p className="text-resume-400 mb-2">
-            <strong>{t.originalProject}</strong>{' '}
-            <a
-              href="https://github.com/sadanandpai/resume-builder"
-              target="_blank"
-              rel="noreferrer"
-              className="underline"
-            >
-              sadanandpai/resume-builder
-            </a>
-          </p>
-          <p className="text-resume-400 mb-2">
-            <strong>{t.originalAuthors}</strong> Sadanand Pai, Gopalakrishnan, Vivek G, Siva K
-          </p>
-          <p className="text-resume-400 mb-2">
-            <strong>{t.maintainedBy}</strong> Ioannis Axaopoulos (yannismc) —{' '}
-            <a
-              href="https://github.com/yannismc/dimiourgia-biografikou"
-              target="_blank"
-              rel="noreferrer"
-              className="underline"
-            >
-              yannismc/dimiourgia-biografikou
-            </a>
-          </p>
-          <p className="text-resume-400 mb-4">
-            <strong>{t.whatChanged}</strong>
-          </p>
-          <ul className="list-disc pl-6 text-resume-400 mb-4">
-            {t.changesList.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-          <p className="text-resume-400 text-sm">{t.noEndorsement}</p>
-          <p className="text-resume-400 text-sm mt-2">
-            License: MIT. Original copyright notice and attribution are preserved.
-          </p>
-        </div>
-      </div>
+      </section>
     </motion.div>
   );
 };
