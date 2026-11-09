@@ -4,28 +4,24 @@ const persons = [
   {
     name: 'Sadanand Pai',
     role: 'Frontend Engineer',
-    avatar: 'https://avatars.githubusercontent.com/u/12962887?v=4',
     github: 'https://github.com/sadanandpai',
     linkedin: 'https://www.linkedin.com/in/sadanandpai/',
   },
   {
     name: 'Gopalakrishnan',
     role: 'Frontend Engineer',
-    avatar: 'https://avatars.githubusercontent.com/u/22369081?v=4',
     github: 'https://github.com/gopal1996',
     linkedin: 'https://www.linkedin.com/in/gopal1996',
   },
   {
     name: 'Vivek G',
     role: 'Product designer, UI developer',
-    avatar: 'https://avatars.githubusercontent.com/u/26523871?v=4',
     github: 'https://github.com/vivek-nexus',
     linkedin: 'https://www.linkedin.com/in/vivek-nexus',
   },
   {
     name: 'Siva K',
     role: 'Frontend Engineer',
-    avatar: 'https://avatars.githubusercontent.com/u/60533560?v=4',
     github: 'https://github.com/siva-kannan3',
     linkedin: 'https://www.linkedin.com/in/siva-kannan3/',
   },
@@ -37,32 +33,55 @@ const PersonCard = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-const ProfileSocial = ({ github, linkedin }: { github: string; linkedin: string }) => (
+const ProfileSocial = ({
+  name,
+  github,
+  linkedin,
+}: {
+  name: string;
+  github: string;
+  linkedin: string;
+}) => (
   <div className="flex gap-4">
-    <a href={github} target="_blank" rel="noreferrer">
+    <a href={github} target="_blank" rel="noopener noreferrer" aria-label={`${name} — GitHub`}>
       <Image src="/icons/github.svg" alt="github" width="24" height="24" className="w-auto" />
     </a>
-    <a href={linkedin} target="_blank" rel="noreferrer">
+    <a href={linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${name} — LinkedIn`}>
       <Image src="/icons/linkedin.svg" alt="linkedin" width="24" height="24" className="w-auto" />
     </a>
   </div>
 );
 
-export default function Person() {
+export default function MaintainerProfile({ role }: { role: string }) {
+  return (
+    <PersonCard>
+      <Image
+        src="/contributors/yannismc.png"
+        alt="Ioannis Axaopoulos"
+        className="rounded-full object-cover"
+        height="128"
+        width="128"
+      />
+      <h3 className="text-resume-800 mt-4 text-xl font-bold">Ioannis Axaopoulos</h3>
+      <p className="text-resume-400 mb-2">yannismc</p>
+      <p className="text-resume-400 mb-6">{role}</p>
+      <ProfileSocial
+        name="Ioannis Axaopoulos"
+        github="https://github.com/yannismc"
+        linkedin="https://www.linkedin.com/in/axaojon/"
+      />
+    </PersonCard>
+  );
+}
+
+export function OriginalCreators() {
   return (
     <>
       {persons.map((person) => (
         <PersonCard key={person.name}>
-          <Image
-            src={person.avatar}
-            alt={person.name}
-            className="rounded-full"
-            height="96"
-            width="96"
-          />
-          <p className="text-resume-800 mt-4 font-bold">{person.name}</p>
+          <h4 className="text-resume-800 font-bold">{person.name}</h4>
           <p className="text-resume-400 mb-6">{person.role}</p>
-          <ProfileSocial github={person.github} linkedin={person.linkedin} />
+          <ProfileSocial name={person.name} github={person.github} linkedin={person.linkedin} />
         </PersonCard>
       ))}
     </>

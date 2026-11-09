@@ -15,6 +15,9 @@ export const isTeiAthensExperience = (item: any) => {
   const institution = normalizeInstitution(item?.name);
   return (
     institution.includes('tei athin') ||
+    institution.includes('tei athen') ||
+    institution.includes("tei d'athenes") ||
+    institution.includes('tei d’athenes') ||
     institution.includes('tei of athens') ||
     institution.includes('τει αθην')
   );

@@ -1,4 +1,5 @@
 import { useCloudResumeStore } from '@/stores/useCloudResumeStore';
+import { useResumeLanguageStore } from '@/stores/useResumeLanguageStore';
 import { useActivity } from '@/stores/activity';
 import { useAwards } from '@/stores/awards';
 import { useBasicDetails } from '@/stores/basic';
@@ -41,4 +42,5 @@ export function applyImportedResumeJson(uploadedResumeJSON: unknown): void {
   useAwards.getState().reset(awards);
   useActivity.getState().reset(activities);
   if (metadata) applyResumeMetadata(metadata);
+  else useResumeLanguageStore.getState().setLanguage('en');
 }

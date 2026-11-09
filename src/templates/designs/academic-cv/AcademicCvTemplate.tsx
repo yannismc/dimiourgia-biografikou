@@ -1,6 +1,14 @@
 import { padding, bodySize } from '@/helpers/resume-style/styles';
 import { HTMLRenderer } from '@/helpers/common/components/HTMLRenderer';
-import { formatDate, formatDateRange } from '@/templates/components/primitives/formatDateRange';
+import { useResumeLanguageStore, type ResumeLanguage } from '@/stores/useResumeLanguageStore';
+import { useSectionTitleStore } from '@/stores/useSectionTitleStore';
+import {
+  ACADEMIC_LABELS,
+  academicDate,
+  academicDateRange,
+  academicFooter,
+} from './academicCvLocale';
+import { fitAcademicPage } from './academicPageFit';
 import type {
   AwardItem,
   EducationItem,
@@ -14,7 +22,9 @@ import { pageStyle } from '@/templates/components/primitives/layoutPrimitives';
 import { ResumePresentation, useResumePalette } from '@/templates/components/theme';
 import { getEducationThesis } from '@/helpers/educationThesis';
 import {
+  Fragment,
   useContext,
+  useEffect,
   useLayoutEffect,
   useRef,
   useState,
@@ -33,53 +43,94 @@ function AcademicPage({
   children,
   name,
   pageNumber,
+  language,
 }: {
   children: ReactNode;
   name: string;
   pageNumber: number;
+  language: ResumeLanguage;
 }) {
   const palette = useResumePalette();
   const pageRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [fitScale, setFitScale] = useState(1);
+  const [fit, setFit] = useState({ scale: 1, overflow: 0, state: 'pending' });
 
   useLayoutEffect(() => {
     const page = pageRef.current;
     const content = contentRef.current;
     if (!page || !content) return;
 
+    let active = true;
+    let frame = 0;
     const fitToPage = () => {
+      if (!active) return;
       const computed = window.getComputedStyle(page);
       const verticalPadding =
         Number.parseFloat(computed.paddingTop) + Number.parseFloat(computed.paddingBottom);
       const footer = page.querySelector<HTMLElement>('.academic-cv-footer');
-      const footerHeight = footer?.getBoundingClientRect().height ?? 0;
+      // offsetHeight is unscaled; getBoundingClientRect depends on preview zoom.
+      const footerHeight = footer?.offsetHeight ?? 0;
       const availableHeight = page.clientHeight - verticalPadding - footerHeight - 8;
-      const contentHeight = content.scrollHeight;
-      if (availableHeight <= 0 || contentHeight <= 0) return;
-      const appliedScale =
-        Number.parseFloat(
-          window.getComputedStyle(content).getPropertyValue('--resume-fit-scale')
-        ) || 1;
-      const nextScale = Math.min(1, ((appliedScale * availableHeight) / contentHeight) * 0.995);
-      setFitScale((current) => (Math.abs(current - nextScale) > 0.001 ? nextScale : current));
+      const result = fitAcademicPage(availableHeight, (scale) => {
+        content.style.setProperty('--resume-fit-scale', String(scale));
+        return content.scrollHeight;
+      });
+      content.style.setProperty('--resume-fit-scale', String(result.scale));
+      const overflow = Math.max(result.overflow, content.scrollWidth - content.clientWidth);
+      const state =
+        !result.ready || document.fonts?.status === 'loading'
+          ? 'pending'
+          : overflow > 1
+            ? 'overflow'
+            : 'ready';
+      setFit((previous) =>
+        previous.scale === result.scale &&
+        previous.overflow === overflow &&
+        previous.state === state
+          ? previous
+          : { scale: result.scale, overflow, state }
+      );
     };
-
-    fitToPage();
+    const scheduleFit = () => {
+      if (!active) return;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(fitToPage);
+    };
+    const fontsLoading = () => {
+      setFit((previous) => ({ ...previous, state: 'pending' }));
+    };
+    scheduleFit();
     const observer =
-      typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(fitToPage);
+      typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(scheduleFit);
     observer?.observe(page);
     observer?.observe(content);
-    if (!observer) window.addEventListener('resize', fitToPage);
-    document.fonts?.ready.then(fitToPage);
+    window.addEventListener('resize', scheduleFit);
+    window.addEventListener('beforeprint', fitToPage);
+    document.fonts?.ready.then(scheduleFit);
+    document.fonts?.addEventListener('loading', fontsLoading);
+    document.fonts?.addEventListener('loadingdone', scheduleFit);
     return () => {
+      active = false;
+      cancelAnimationFrame(frame);
       observer?.disconnect();
-      if (!observer) window.removeEventListener('resize', fitToPage);
+      window.removeEventListener('resize', scheduleFit);
+      window.removeEventListener('beforeprint', fitToPage);
+      document.fonts?.removeEventListener('loading', fontsLoading);
+      document.fonts?.removeEventListener('loadingdone', scheduleFit);
     };
-  }, [children]);
+  }, [children, language]);
 
   return (
-    <div className="resume-a4-page" role="region" aria-label={`Resume page ${pageNumber}`}>
+    <div
+      className="resume-a4-page"
+      role="region"
+      lang={language}
+      aria-label={`${ACADEMIC_LABELS[language].page} ${pageNumber}`}
+      data-cv-fit-state={fit.state}
+      data-cv-fit-scale={fit.scale}
+      data-cv-overflow-px={Math.max(0, fit.overflow)}
+      style={{ overflow: fit.state === 'overflow' ? 'visible' : undefined }}
+    >
       <div
         ref={pageRef}
         className="resume-page-content academic-cv-page"
@@ -107,13 +158,11 @@ function AcademicPage({
         <div
           ref={contentRef}
           className="academic-cv-content"
-          style={{ '--resume-fit-scale': fitScale } as CSSProperties}
+          style={{ '--resume-fit-scale': fit.scale } as CSSProperties}
         >
           {children}
         </div>
-        <div className="academic-cv-footer">
-          {`${name} — Curriculum Vitae | Page ${pageNumber} of 2`}
-        </div>
+        <div className="academic-cv-footer">{academicFooter(name, pageNumber, language)}</div>
       </div>
     </div>
   );
@@ -183,25 +232,34 @@ function compactUrl(value?: string) {
   return (value ?? '').replace(/^https?:\/\//i, '').replace(/\/$/, '');
 }
 
-function skillRows(skills: Record<string, SkillItem[] | undefined>) {
+function skillRows(skills: Record<string, SkillItem[] | undefined>, language: ResumeLanguage) {
+  const labels = ACADEMIC_LABELS[language];
   const categories: [string, keyof typeof skills][] = [
-    ['Frameworks', 'frameworks'],
-    ['Technologies', 'technologies'],
-    ['Libraries', 'libraries'],
-    ['Databases', 'databases'],
-    ['Methods', 'practices'],
-    ['Tools', 'tools'],
+    [labels.frameworks, 'frameworks'],
+    [labels.technologies, 'technologies'],
+    [labels.libraries, 'libraries'],
+    [labels.databases, 'databases'],
+    [labels.practices, 'practices'],
+    [labels.tools, 'tools'],
   ];
   const rows = categories
     .map(([label, key]) => ({ label, items: skills[key] ?? [] }))
     .filter(({ items }) => items.length > 0);
   const programming = (skills.languages ?? []).filter((item) => isProgrammingLanguage(item.name));
-  if (programming.length) rows.unshift({ label: 'Programming', items: programming });
+  if (programming.length) rows.unshift({ label: labels.programming, items: programming });
   return rows;
 }
 
 export default function AcademicCvTemplate() {
   const data = useContext(StateContext);
+  const language = useResumeLanguageStore((state) => state.language);
+  const overrides = useSectionTitleStore((state) => state.titles['academic-cv']);
+  useEffect(() => {
+    useResumeLanguageStore.getState().hydrate();
+    useSectionTitleStore.getState().hydrate();
+  }, []);
+  const labels = ACADEMIC_LABELS[language];
+  const title = (id: keyof typeof labels) => overrides?.[id] ?? labels[id];
   const { regions } = useSectionLayoutRuntime();
   const basics = data.basics;
   const education: EducationItem[] = data.education ?? [];
@@ -211,38 +269,48 @@ export default function AcademicCvTemplate() {
   const languages: SkillItem[] = skills.languages ?? [];
   const publicationHtml = data.activities?.publications ?? '';
   const researchInterests: string[] = data.activities?.researchInterests ?? [];
-  const firstAffiliation =
-    education[0]?.institution.replace(/\s*\([^)]*\)\s*$/, '') || work[0]?.name || '';
+  const location = basics.location?.city?.trim();
   const website = compactUrl(basics.url);
   const websiteHref = basics.url
     ? /^https?:\/\//i.test(basics.url)
       ? basics.url
       : `https://${basics.url}`
     : '';
+  const contacts = [
+    { id: 'location', content: location ? <span>{location}</span> : null },
+    { id: 'website', content: website ? <a href={websiteHref}>{website}</a> : null },
+    {
+      id: 'phone',
+      content: basics.phone ? <span>{`${labels.phone} ${basics.phone}`}</span> : null,
+    },
+    {
+      id: 'email',
+      content: basics.email ? <a href={`mailto:${basics.email}`}>{basics.email}</a> : null,
+    },
+  ].filter((contact) => contact.content !== null);
 
   const renderSection = (id: string) => {
     switch (id) {
       case 'summary':
         return (
-          <AcademicSection title="Research Interests">
+          <AcademicSection title={title('summary')}>
             <AcademicRichText html={basics.summary} />
           </AcademicSection>
         );
       case 'research_experience': {
         const researchWork = work.filter(isResearchExperience);
         return researchWork.length ? (
-          <AcademicSection title="Research Experience">
+          <AcademicSection title={title('research_experience')}>
             {researchWork.map((item, index) => (
               <div className="academic-cv-entry" key={item.id || index}>
                 <EntryHeader
                   title={item.position}
                   titleBold={false}
-                  date={formatDateRange(
+                  date={academicDateRange(
                     item.startDate,
                     item.endDate,
                     item.isWorkingHere,
-                    'en',
-                    true
+                    language
                   )}
                 />
                 {item.name && <div className="academic-cv-work-org">{item.name}</div>}
@@ -254,7 +322,7 @@ export default function AcademicCvTemplate() {
       }
       case 'education':
         return education.length ? (
-          <AcademicSection title="Education">
+          <AcademicSection title={title('education')}>
             {education.map((item, index) => {
               const thesis = getEducationThesis(item);
               const legacyThesisIndex = thesis.legacyCourseIndices[0];
@@ -276,12 +344,11 @@ export default function AcademicCvTemplate() {
                     title={item.institution}
                     subtitle={item.isStudyingHere ? item.studyType : undefined}
                     subtitleBold={item.isStudyingHere}
-                    date={formatDateRange(
+                    date={academicDateRange(
                       item.startDate,
                       item.endDate,
                       item.isStudyingHere,
-                      'en',
-                      true
+                      language
                     )}
                   />
                   {!item.isStudyingHere && item.studyType && (
@@ -302,7 +369,8 @@ export default function AcademicCvTemplate() {
                       {educationBullets.map((bullet, courseIndex) =>
                         bullet.type === 'thesis' ? (
                           <li key={`${item.id || index}-thesis-${courseIndex}`}>
-                            <strong>Thesis:</strong> {thesis.title && <>“{thesis.title}”</>}
+                            <strong>{labels.thesis}:</strong>{' '}
+                            {thesis.title && <>“{thesis.title}”</>}
                             {thesis.details && (
                               <>
                                 {thesis.title ? ' – ' : ''}
@@ -324,17 +392,16 @@ export default function AcademicCvTemplate() {
       case 'work': {
         const professionalWork = work.filter((item) => !isResearchExperience(item));
         return professionalWork.length ? (
-          <AcademicSection title="Professional Experience">
+          <AcademicSection title={title('work')}>
             {professionalWork.map((item, index) => (
               <div className="academic-cv-entry" key={item.id || index}>
                 <EntryHeader
                   title={item.position}
-                  date={formatDateRange(
+                  date={academicDateRange(
                     item.startDate,
                     item.endDate,
                     item.isWorkingHere,
-                    'en',
-                    true
+                    language
                   )}
                 />
                 {item.name && <div className="academic-cv-work-org">{item.name}</div>}
@@ -346,7 +413,7 @@ export default function AcademicCvTemplate() {
       }
       case 'research_interests':
         return researchInterests.length ? (
-          <AcademicSection title="Research Interests">
+          <AcademicSection title={title('research_interests')}>
             <ul className="academic-cv-bullets">
               {researchInterests.map((interest, index) => (
                 <li key={`${interest}-${index}`}>{interest}</li>
@@ -356,13 +423,13 @@ export default function AcademicCvTemplate() {
         ) : null;
       case 'awards':
         return awards.length ? (
-          <AcademicSection title="Awards, Grants & Funding">
+          <AcademicSection title={title('awards')}>
             <ul className="academic-cv-bullets academic-cv-awards">
               {awards.map((item, index) => (
                 <li key={item.id || index}>
                   <strong>{item.title}</strong>
                   {item.awarder && ` — ${item.awarder}`}
-                  {item.date && ` (${formatDate(item.date, 'en', true)})`}
+                  {item.date && ` (${academicDate(item.date, language)})`}
                   <AcademicRichText html={item.summary} />
                 </li>
               ))}
@@ -371,20 +438,20 @@ export default function AcademicCvTemplate() {
         ) : null;
       case 'publications':
         return publicationHtml.trim() ? (
-          <AcademicSection title="Publications" className="academic-cv-publications">
+          <AcademicSection title={title('publications')} className="academic-cv-publications">
             <AcademicRichText html={publicationHtml} />
           </AcademicSection>
         ) : null;
       case 'skills': {
-        const rows = skillRows(skills);
+        const rows = skillRows(skills, language);
         return rows.length ? (
-          <AcademicSection title="Technical Skills">
+          <AcademicSection title={title('skills')}>
             <div className="academic-cv-skill-rows">
               {rows.map((row) => {
                 const label =
-                  row.label === 'Programming' &&
+                  row.label === labels.programming &&
                   row.items.every((item) => (item.level > 5 ? item.level >= 75 : item.level >= 4))
-                    ? 'Programming (advanced)'
+                    ? `${labels.programming} (${labels.advanced})`
                     : row.label;
                 return (
                   <div key={row.label}>
@@ -398,7 +465,7 @@ export default function AcademicCvTemplate() {
       }
       case 'languages':
         return languages.some((language) => !isProgrammingLanguage(language.name)) ? (
-          <AcademicSection title="Languages">
+          <AcademicSection title={title('languages')}>
             <div className="academic-cv-language-line">
               {languages
                 .filter((language) => !isProgrammingLanguage(language.name))
@@ -407,19 +474,19 @@ export default function AcademicCvTemplate() {
                   const descriptor =
                     level > 5
                       ? level >= 90
-                        ? 'native'
+                        ? labels.native
                         : level >= 75
-                          ? 'fluent, professional'
+                          ? labels.fluent
                           : level >= 50
-                            ? 'intermediate'
-                            : 'basic'
+                            ? labels.intermediate
+                            : labels.basic
                       : level >= 5
-                        ? 'native'
+                        ? labels.native
                         : level >= 4
-                          ? 'fluent, professional'
+                          ? labels.fluent
                           : level >= 3
-                            ? 'intermediate'
-                            : 'basic';
+                            ? labels.intermediate
+                            : labels.basic;
                   return (
                     <span key={`${language.name}-${index}`}>
                       {index > 0 && ' · '}
@@ -438,33 +505,20 @@ export default function AcademicCvTemplate() {
   return (
     <ResumePresentation value="standard">
       <>
-        <AcademicPage name={basics.name} pageNumber={1}>
+        <AcademicPage name={basics.name} pageNumber={1} language={language}>
           <header className="academic-cv-header">
             <h1>{basics.name}</h1>
             {basics.label && (
               <div className="academic-cv-tagline">{basics.label.replace(/\s*·\s*/g, ' · ')}</div>
             )}
-            {(firstAffiliation || website || basics.phone || basics.email) && (
+            {contacts.length > 0 && (
               <div className="academic-cv-contact">
-                {firstAffiliation && <span>{firstAffiliation}</span>}
-                {website && (
-                  <>
-                    <span className="academic-cv-contact-separator">|</span>
-                    <a href={websiteHref}>{website}</a>
-                  </>
-                )}
-                {basics.phone && (
-                  <>
-                    <span className="academic-cv-contact-separator">|</span>
-                    <span>{`tel: ${basics.phone}`}</span>
-                  </>
-                )}
-                {basics.email && (
-                  <>
-                    <span className="academic-cv-contact-separator">|</span>
-                    <a href={`mailto:${basics.email}`}>{basics.email}</a>
-                  </>
-                )}
+                {contacts.map((contact, index) => (
+                  <Fragment key={contact.id}>
+                    {index > 0 && <span className="academic-cv-contact-separator">|</span>}
+                    {contact.content}
+                  </Fragment>
+                ))}
               </div>
             )}
           </header>
@@ -472,15 +526,15 @@ export default function AcademicCvTemplate() {
             regionId="page1"
             items={regions.page1}
             renderSection={renderSection}
-            language="en"
+            language={language === 'el' ? 'el' : 'en'}
           />
         </AcademicPage>
-        <AcademicPage name={basics.name} pageNumber={2}>
+        <AcademicPage name={basics.name} pageNumber={2} language={language}>
           <TemplateRegion
             regionId="page2"
             items={regions.page2}
             renderSection={renderSection}
-            language="en"
+            language={language === 'el' ? 'el' : 'en'}
           />
         </AcademicPage>
       </>
